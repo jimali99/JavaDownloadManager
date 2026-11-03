@@ -196,7 +196,7 @@ public class LocalApiServer {
         if ("POST".equalsIgnoreCase(method)) {
             url = extractJsonField(body, "url");
             fileName = extractJsonField(body, "fileName");
-            cookiesData = extractJsonField(body, "cookies");
+            cookiesData = extractJsonString(body, "cookies");
             String autoStr = extractJsonField(body, "autoStart");
             if (autoStr != null) {
                 autoStart = "true".equalsIgnoreCase(autoStr);
@@ -304,6 +304,40 @@ public class LocalApiServer {
             out.write(bodyBytes);
         }
         out.flush();
+    }
+
+    private static String extractJsonString(String json, String key) {
+        if (json == null) return null;
+        String needle = "\"" + key + "\"";
+        int keyIdx = json.indexOf(needle);
+        if (keyIdx == -1) return null;
+        int colonIdx = json.indexOf(':', keyIdx + needle.length());
+        if (colonIdx == -1) return null;
+        int quoteStart = json.indexOf('"', colonIdx + 1);
+        if (quoteStart == -1) return null;
+
+        StringBuilder sb = new StringBuilder();
+        boolean escape = false;
+        for (int i = quoteStart + 1; i < json.length(); i++) {
+            char c = json.charAt(i);
+            if (escape) {
+                if (c == 'n') sb.append('\n');
+                else if (c == 'r') sb.append('\r');
+                else if (c == 't') sb.append('\t');
+                else if (c == '"') sb.append('"');
+                else if (c == '\\') sb.append('\\');
+                else if (c == '/') sb.append('/');
+                else sb.append(c);
+                escape = false;
+            } else if (c == '\\') {
+                escape = true;
+            } else if (c == '"') {
+                return sb.toString();
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     private static String extractJsonField(String json, String key) {
