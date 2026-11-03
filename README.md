@@ -5,8 +5,8 @@
 <h1 align="center">JDM — Java Download Manager (Accelerated Pro)</h1>
 
 <p align="center">
-  <strong>High-Performance Multi-Threaded File Download Accelerator for Windows</strong><br>
-  <em>Accelerate download speeds up to 5x-10x with dynamic connection segmentation, zero-copy assembly, and Chrome browser integration.</em>
+  <strong>The Ultimate Free & Open-Source Alternative to Internet Download Manager (IDM) for Windows</strong><br>
+  <em>Accelerate download speeds up to 10x with multi-connection byte-range segmentation, zero-copy assembly, and Chrome extension integration.</em>
 </p>
 
 <p align="center">
@@ -19,153 +19,137 @@
 
 ---
 
-## ⚡ Why Does It Download So Fast?
+## ⚡ Why Choose JDM over Browsers and Paid Download Managers?
 
-Traditional web browsers download files using a **single TCP connection**, which is severely bottlenecked by:
-1. TCP window scaling limits and latency over long distances.
-2. Server-side per-connection bandwidth throttling.
-3. Network congestion on individual streams.
+Standard web browsers download files through a single, slow TCP channel. Commercial download managers cost high recurring license fees. **JDM (Java Download Manager)** is 100% free, privacy-friendly, and engineered for maximum speed.
 
-### JDM Dynamic File Segmentation:
-1. **Parallel Segment Acceleration (1 to 32 Connections):**
-   - Probes the server with HTTP Range requests (`Accept-Ranges: bytes` & HTTP 206 Partial Content).
-   - Divides the file into $N$ equal chunks (e.g. 8, 16, or 32 parallel connections).
-   - Concurrently downloads each chunk through separate simultaneous HTTP streams, multiplying throughput to max out your internet bandwidth.
+### 📊 Feature Comparison
 
-2. **Zero-Copy Instant Assembly (`java.nio.channels.FileChannel`):**
-   - Unlike naive downloaders that download `.part1`, `.part2` files and spend several minutes merging them at the end, this application pre-allocates the file and uses thread-safe positioned writes (`FileChannel.write(buffer, offset)`).
-   - The file is assembled **in real-time as bytes arrive**. The moment the last byte finishes downloading, the file is ready instantly!
-
-3. **Rock-Solid Pause & Resume:**
-   - Tracks exact downloaded offsets for every active chunk in a `.idm_meta` state file.
-   - You can pause downloads, close the app, shut down your PC, and resume right where you left off.
+| Feature | Standard Browser (Chrome / Edge) | Commercial IDM ($24.95) | **JDM (Free & Open Source)** |
+| :--- | :---: | :---: | :---: |
+| **Download Speed** | 1x (Single thread) | Up to 10x | **Up to 10x (1–32 Parallel Streams)** 🚀 |
+| **Pause & Resume** | ⚠️ Unreliable | ✅ Yes | **✅ Rock-Solid Offset Recovery** |
+| **File Assembly Overhead** | None | ⏳ Slow post-download merge | **⚡ Instant Zero-Copy (`FileChannel`)** |
+| **Video Stream Sniffer** | ❌ No | ✅ Yes | **✅ Yes (Floating Button & Dropdown)** |
+| **Chrome Extension** | N/A | Manifest V2 (Outdated) | **✅ Manifest V3 Modern Integration** |
+| **User Interface** | Basic tab | Legacy Windows 98 Look | **✨ Modern Rounded Dark Theme (FlatLaf)** |
+| **License & Price** | Free | 💰 $24.95 / Yearly Fee | **🎉 100% Free Forever (MIT License)** |
+| **Open Source** | Closed | Closed Source | **🔓 100% Transparent & Verifiable** |
 
 ---
 
-## 🚀 Key Features Matching JDM
+## 🚀 Key Performance Architecture
 
-- **JDM Visual Segment Acceleration Bar:**
-  - Iconic real-time visualization showing live progress and colors for every connection chunk.
-  - Per-thread inspection table showing Thread #, Range, Downloaded Bytes, %, Speed, and Status.
-- **Modern Polished Interface:**
-  - Official custom JDM logo, window icons, and system tray branding.
-  - Modern Windows 11 rounded dark theme powered by FlatLaf.
-  - Interactive table with embedded progress capsules, transfer speed, and ETA countdown.
-  - Category sidebar: Compressed (.zip, .rar, .iso), Documents (.pdf, .doc), Videos (.mp4, .mkv), Music (.mp3), Programs (.exe, .msi), and Custom.
-- **Smart Queue & Scheduling:**
-  - Limit max concurrent active downloads (e.g., 3 active) while others wait in queue.
-  - Auto-start next task upon completion.
-  - Pause All / Resume All buttons.
-- **Clipboard URL Sniffer:**
-  - Background monitor that automatically catches copied download links and prompts you to download immediately.
-- **Completion Chimes & System Tray:**
-  - Synthesized pleasant completion chime.
-  - Minimizes cleanly to Windows System Tray.
-- **Customizable Speed Limiter & User-Agent:**
-  - Set global speed cap (e.g. 500 KB/s or unlimited).
-  - Uses modern browser User-Agent so CDNs and Cloudflare don't throttle or block automated requests.
+### 1. Dynamic Parallel Segmentation (1 to 32 Connections)
+- Automatically probes servers for partial content support (`Accept-Ranges: bytes` & HTTP 206).
+- Splits files into $N$ simultaneous parallel byte-range streams, multiplying throughput and bypassing server-side throttling.
+
+### 2. Zero-Copy Instant Assembly (`java.nio.channels.FileChannel`)
+- Traditional downloaders download fragmented files (`.part1`, `.part2`) and freeze your computer while merging them at 100%.
+- JDM pre-allocates the file and uses high-speed thread-safe positioned writes. **The exact millisecond the final chunk finishes, your file is 100% ready to open.**
+
+### 3. Fail-Safe Pause & Resume Engine
+- Saves byte checkpoints in real-time (`.idm_meta`).
+- Pause any download, close the application, shut down your PC, and resume seamlessly right where you left off.
 
 ---
 
-## 🖥️ How to Run & Use
+## 🌟 Highlights & Capabilities
 
-### Option 1: One-Click Run (Easiest)
-Simply double-click **`run.bat`** in the project folder, or run:
+- **Real-Time Visual Segment Bar**: Live color-coded visualization showing the byte progress of every parallel thread.
+- **Chrome Integration Module**: Intercepts browser downloads, adds right-click context menus, and detects active media streams.
+- **Automatic Video Grabber**: Floating download button on video players with instant format/resolution stream selection.
+- **Clipboard Sniffer**: Automatically catches copied URLs from your clipboard and prompts you to download.
+- **Smart Queue & Bandwidth Limiter**: Limit concurrent active tasks and set custom speed caps.
+- **System Tray Minimization**: Runs quietly in the background without cluttering your taskbar.
+
+---
+
+## 🖥️ Quick Start & Installation
+
+### Option 1: Instant Launch (No Installation Required)
+Simply double-click **`run.bat`** (or directly launch **`IDM-Java.jar`**):
 ```cmd
 run.bat
 ```
-*(Uses `javaw.exe` so the application opens cleanly without an ugly command prompt console window).*
+*(Uses `javaw.exe` so JDM launches silently without opening a terminal window).*
 
-You can also directly double-click **`IDM-Java.jar`**.
-
-### Option 2: Create Desktop Shortcut
-Right-click `create_desktop_shortcut.ps1` and select **"Run with PowerShell"**, or execute in PowerShell:
+### Option 2: Add Desktop Shortcut
+Right-click `create_desktop_shortcut.ps1` ➔ **"Run with PowerShell"**:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\create_desktop_shortcut.ps1
 ```
-A shortcut named **"Java Download Manager (JDM Pro)"** will appear on your Windows Desktop.
 
-### Option 3: Command Line (CLI) Download
-You can pass any URL directly to download it:
+### Option 3: Command-Line Downloader
+Download any URL directly from your command line:
 ```cmd
-run.bat https://example.com/file.zip
+run.bat https://example.com/archive.zip
 ```
 
 ---
 
 ## 🌐 Chrome Extension (JDM Integration Module)
 
-A dedicated Chrome Extension (Manifest V3) is included in `chrome-extension/`. It intercepts browser downloads and adds right-click context menus so you can download files with JDM anytime with a single click.
+A dedicated Manifest V3 Chrome Extension is included in [`chrome-extension/`](chrome-extension/).
 
-### Features of the Extension:
-* **🎬 Automatic Video & Media Stream Sniffer:**
-  * Displays IDM's iconic floating **"⬇ Download this video"** button directly on video players across the web.
-  * Real-time network sniffer detects streaming media (`.mp4`, `.webm`, `.mkv`, `.m4v`, `.flv`, `.ts`, HLS `.m3u8` playlists).
-  * Extension badge shows the count of detected videos on the active tab (e.g. `1`, `2`).
-  * Popup includes a dedicated **"Videos on this Page"** card with one-click download buttons for each detected stream.
-* **Automatic Download Interception:** When you click any download link in Chrome, the extension automatically catches it, pauses Chrome's slow single-thread download, and redirects it to JDM for multi-thread acceleration.
-* **Right-Click Context Menus:**
-  * Right-click any link ➔ **"Download with JDM"**
-  * Right-click any video, audio, or image ➔ **"Download video / media with JDM"**
-  * Right-click selected text with a URL ➔ **"Download selected link with JDM"**
-* **Popup Control Center:**
-  * Live status indicator: 🟢 Connected to JDM / 🔴 JDM Offline
-  * Real-time active download counter and aggregate download speed
-  * Quick URL download box (with clipboard paste support)
-  * One-click toggle switch to enable/disable automatic interception
-  * "Open JDM Window" button
-
-### 30-Second Installation in Chrome:
-1. Double-click `install_chrome_extension.bat` (or open `chrome://extensions` in Google Chrome).
-2. Toggle on **Developer mode** in the top-right corner of the Extensions page.
-3. Click the **"Load unpacked"** button in the top-left corner.
-4. Select the `chrome-extension` folder inside this repository:
-   ```text
-   JavaDownloadManager\chrome-extension
-   ```
-5. Done! The extension is active and will immediately route downloads to JDM whenever JDM is running.
+### 3-Step Setup in Google Chrome:
+1. Double-click `install_chrome_extension.bat` (or open `chrome://extensions`).
+2. Turn on **Developer mode** in the top-right corner.
+3. Click **"Load unpacked"** and select the [`chrome-extension`](chrome-extension/) folder.
+4. Done! Every download link and video stream in Chrome will now route through JDM.
 
 ---
 
-## 🛠️ How to Rebuild from Source
+## ❓ Frequently Asked Questions (FAQ)
 
-If you ever modify the Java source files in `src/`, simply run:
+<details>
+<summary><b>Why does the Chrome extension say "Offline"?</b></summary>
+The extension is a companion remote control that communicates with JDM on your computer. Simply open JDM (run <code>run.bat</code>) and the extension will immediately show <b>🟢 Connected</b>.
+</details>
+
+<details>
+<summary><b>Can JDM download YouTube videos?</b></summary>
+JDM sniffs and downloads all direct video and audio streams (MP4, MKV, WebM, FLV, HLS .m3u8). For YouTube, high-resolution streams (1080p, 4K) are split by YouTube into separate encrypted video and audio channels that require stream multiplexing. JDM downloads standard web streams and direct video files directly.
+</details>
+
+<details>
+<summary><b>Does JDM work on Windows 10 and Windows 11?</b></summary>
+Yes! JDM includes native FlatLaf dark themes optimized for modern Windows 10 and 11 with High-DPI screen support.
+</details>
+
+---
+
+## 🛠️ Build from Source
+
 ```cmd
 build.bat
 ```
-It will recompile with `javac` and generate an updated self-contained `IDM-Java.jar`.
+Compiles with `javac` and packages the standalone executable FAT-JAR `IDM-Java.jar`.
 
 ---
 
-## 📁 Project Structure
+## 📁 Repository Structure
 
 ```
 JavaDownloadManager/
 ├── IDM-Java.jar                 # Standalone executable FAT-JAR (bundled with FlatLaf & icons)
-├── assets/                      # High-res logos and banners for repository
-│   ├── logo-banner.png          # Hero presentation banner (1024x558)
-│   └── logo-square.png          # Square focused brand emblem
-├── resources/                   # Application icons (16px to 256px)
-├── chrome-extension/            # Chrome Extension (Manifest V3)
-│   ├── manifest.json
-│   ├── background.js            # Download interceptor & media sniffer
+├── assets/                      # Official high-resolution brand banners & logos
+│   ├── logo-banner.png          # Presentation banner (1024x558)
+│   └── logo-square.png          # Square brand emblem
+├── resources/                   # Multi-resolution icons (16px to 256px)
+├── chrome-extension/            # Dedicated Chrome Extension (Manifest V3)
+│   ├── manifest.json            # Extension metadata
+│   ├── background.js            # Network sniffer & download interceptor
 │   ├── content.js               # Floating video download button
-│   ├── popup.html               # Extension UI & video downloader
-│   └── icons/                   # Chrome extension icons
+│   └── popup.html               # Popup control center
 ├── run.bat                      # Silent launcher script
 ├── build.bat                    # One-click compiler & packager
 ├── create_desktop_shortcut.ps1  # Windows desktop shortcut creator
 ├── flatlaf-3.5.4.jar            # Modern UI theme library
-└── src/
-    └── com/idm/
-        ├── Main.java                        # High-DPI entry point
-        ├── model/                           # Task models and state management
-        ├── engine/                          # Multi-thread FileChannel accelerated engine
-        ├── ui/                              # Modern FlatLaf dark interface and icons
-        │   ├── AppIcons.java                # Vector and resource icon loader
-        │   ├── MainFrame.java               # Main JDM window with toolbar & categories
-        │   ├── DownloadDetailDialog.java    # Real-time inspection window
-        │   ├── SegmentVisualizerPanel.java  # Visual connection chunk bar
-        │   └── SettingsDialog.java          # Preferences dialog
-        └── util/                            # Sound, clipboard, and format helpers
+└── src/com/idm/                 # Clean Java modular source code
 ```
+
+---
+
+## 🏷️ Keywords & Topics
+`idm-alternative` • `internet-download-manager` • `download-manager` • `download-accelerator` • `java-download-manager` • `multithreaded-downloader` • `chrome-extension` • `video-downloader` • `hls-downloader` • `file-downloader` • `flatlaf` • `windows-app` • `open-source-idm`
