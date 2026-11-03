@@ -101,15 +101,16 @@ async function loadDetectedVideos() {
             videoList.innerHTML = "";
 
             if (isYouTube) {
-                videoCount.textContent = Math.max(1, list.length);
+                videoCount.textContent = "1";
                 const cleanTitle = (tab.title || "YouTube Video").replace(" - YouTube", "").trim();
+                const cleanUrl = cleanYouTubeUrl(tab.url);
 
                 const card = document.createElement("div");
                 card.className = "video-card";
                 card.style.borderColor = "#ef4444";
                 card.innerHTML = `
                     <div class="video-card-info">
-                        <span class="video-card-title" title="${escapeHtml(tab.url)}">🎬 ${escapeHtml(cleanTitle)}</span>
+                        <span class="video-card-title" title="${escapeHtml(cleanUrl)}">🎬 ${escapeHtml(cleanTitle)}</span>
                         <div class="video-card-meta">
                             <span class="badge-format" style="background:#dc2626;color:#ffffff;font-weight:bold;">YOUTUBE HD</span>
                             <span>Full Video + Audio (.mp4)</span>
@@ -124,7 +125,7 @@ async function loadDetectedVideos() {
                     dlBtn.textContent = "⏳ Starting...";
                     chrome.runtime.sendMessage({
                         type: "DOWNLOAD_MEDIA_ITEM",
-                        url: tab.url,
+                        url: cleanUrl,
                         filename: cleanTitle + ".mp4"
                     }, (res) => {
                         if (res && res.success) {
@@ -139,6 +140,7 @@ async function loadDetectedVideos() {
                     });
                 });
                 videoList.appendChild(card);
+                return; // On YouTube, only show this single targeted video!
             } else {
                 videoCount.textContent = list.length;
             }
@@ -291,6 +293,23 @@ function isLikelyDownloadUrl(url) {
     ];
     const cleanUrl = url.split("?")[0].toLowerCase();
     return extensions.some(ext => cleanUrl.endsWith(ext));
+}
+
+function cleanYouTubeUrl(url) {
+    try {
+        const u = new URL(url);
+        const v = u.searchParams.get("v");
+        if (v) return `https://www.youtube.com/watch?v=${v}`;
+        if (u.pathname.startsWith("/shorts/")) {
+            const id = u.pathname.split("/")[2];
+            if (id) return `https://www.youtube.com/watch?v=${id}`;
+        }
+        if (u.hostname === "youtu.be") {
+            const id = u.pathname.substring(1);
+            if (id) return `https://www.youtube.com/watch?v=${id}`;
+        }
+    } catch (e) {}
+    return url;
 }
 
 function formatBytes(bytes) {

@@ -163,6 +163,12 @@ chrome.webRequest.onHeadersReceived.addListener(
             }
         }
 
+        // Ignore YouTube internal chunked streaming segments (.googlevideo.com / videoplayback)
+        // YouTube videos are handled exclusively by JDM's YouTube Engine
+        if (details.url.includes("googlevideo.com") || details.url.includes("youtube.com/videoplayback")) {
+            return;
+        }
+
         const isMediaMime = MEDIA_MIMES.some(m => contentType.includes(m));
         const isMediaExt = MEDIA_EXTENSIONS.test(details.url);
 

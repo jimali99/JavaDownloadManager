@@ -216,11 +216,12 @@ public class LocalApiServer {
         final String downloadUrl = url.trim();
 
         if (UrlProber.isYouTubeUrl(downloadUrl)) {
+            final String cleanYtUrl = UrlProber.cleanYouTubeUrl(downloadUrl);
             SwingUtilities.invokeLater(() -> {
                 mainFrame.setVisible(true);
                 mainFrame.setExtendedState(JFrame.NORMAL);
                 mainFrame.toFront();
-                AddDownloadDialog.launchYouTubeDownloader(downloadUrl);
+                AddDownloadDialog.launchYouTubeDownloader(cleanYtUrl);
             });
             sendResponse(out, 200, "OK", "application/json", "{\"success\":true,\"message\":\"YouTube video sent to JDM YouTube Engine\"}");
             return;

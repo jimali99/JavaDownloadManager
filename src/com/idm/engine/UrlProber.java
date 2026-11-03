@@ -56,6 +56,32 @@ public class UrlProber {
                lower.contains("youtube.com/live/");
     }
 
+    public static String cleanYouTubeUrl(String url) {
+        if (url == null) return null;
+        String trimmed = url.trim();
+        try {
+            // Match watch?v=VIDEO_ID (11 alphanumeric / dash / underscore chars)
+            Pattern pWatch = Pattern.compile("https?://(?:www\\.)?youtube\\.com/watch\\?[^\"'\\s]*v=([a-zA-Z0-9_-]{11})");
+            Matcher mWatch = pWatch.matcher(trimmed);
+            if (mWatch.find()) {
+                return "https://www.youtube.com/watch?v=" + mWatch.group(1);
+            }
+            // Match youtu.be/VIDEO_ID
+            Pattern pShort = Pattern.compile("https?://youtu\\.be/([a-zA-Z0-9_-]{11})");
+            Matcher mShort = pShort.matcher(trimmed);
+            if (mShort.find()) {
+                return "https://www.youtube.com/watch?v=" + mShort.group(1);
+            }
+            // Match shorts/VIDEO_ID
+            Pattern pShorts = Pattern.compile("https?://(?:www\\.)?youtube\\.com/shorts/([a-zA-Z0-9_-]{11})");
+            Matcher mShorts = pShorts.matcher(trimmed);
+            if (mShorts.find()) {
+                return "https://www.youtube.com/watch?v=" + mShorts.group(1);
+            }
+        } catch (Exception ignored) {}
+        return trimmed;
+    }
+
     public static ProbeResult probe(String targetUrl, String userAgent) throws IOException {
         String currentUrl = targetUrl;
         HttpURLConnection conn = null;

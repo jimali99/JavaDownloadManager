@@ -227,7 +227,7 @@ public class AddDownloadDialog extends JDialog {
             );
             if (choice == 0) {
                 dispose();
-                launchYouTubeDownloader(url);
+                launchYouTubeDownloader(UrlProber.cleanYouTubeUrl(url));
                 return;
             } else if (choice == 2 || choice == JOptionPane.CLOSED_OPTION) {
                 return;
@@ -263,10 +263,11 @@ public class AddDownloadDialog extends JDialog {
 
     public static void launchYouTubeDownloader(String url) {
         try {
+            String cleanUrl = UrlProber.cleanYouTubeUrl(url);
             // Write URL to temporary file to prevent cmd escaping, & ampersand, and = equal sign truncation
-            if (url != null && !url.trim().isEmpty()) {
+            if (cleanUrl != null && !cleanUrl.trim().isEmpty()) {
                 java.io.File tempFile = new java.io.File(System.getProperty("java.io.tmpdir"), "jdm_yt_url.txt");
-                java.nio.file.Files.writeString(tempFile.toPath(), url.trim(), java.nio.charset.StandardCharsets.UTF_8);
+                java.nio.file.Files.writeString(tempFile.toPath(), cleanUrl.trim(), java.nio.charset.StandardCharsets.UTF_8);
             }
 
             java.io.File bat = null;

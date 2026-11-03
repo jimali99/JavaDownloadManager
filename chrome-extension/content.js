@@ -22,22 +22,37 @@
     function scanAndAttachButtons() {
         const isYouTube = window.location.hostname.includes("youtube.com") || window.location.hostname.includes("youtu.be");
 
+        // On YouTube, only show download button on the actual video watch or shorts page
+        if (isYouTube) {
+            const path = window.location.pathname;
+            const isWatchOrShorts = path === "/watch" || path.startsWith("/shorts/");
+            if (!isWatchOrShorts) {
+                return; // Do not attach to hover previews on home page, search feed, or channels
+            }
+
+            // Find the main active YouTube video element
+            const mainVideo = document.querySelector("#movie_player video, ytd-watch-flexy #player video, ytd-shorts video, #player-container video");
+            if (mainVideo && !mainVideo.dataset.idmAttached) {
+                const playerContainer = mainVideo.closest(".html5-video-player") || mainVideo.closest("#player") || mainVideo.parentElement;
+                if (playerContainer) {
+                    attachIdmButton(mainVideo, playerContainer, true);
+                }
+            }
+            return;
+        }
+
         const videos = document.querySelectorAll("video");
         videos.forEach((video) => {
             if (video.dataset.idmAttached) return;
 
             let parent = video.parentElement;
-            if (isYouTube) {
-                const playerContainer = video.closest(".html5-video-player") || video.closest("#player") || video.parentElement;
-                if (playerContainer) parent = playerContainer;
-            }
             if (!parent) return;
 
             // Avoid attaching inside tiny icons or invisible videos
             const rect = video.getBoundingClientRect();
             if (rect.width > 0 && rect.width < 120 && rect.height < 90) return;
 
-            attachIdmButton(video, parent, isYouTube);
+            attachIdmButton(video, parent, false);
         });
     }
 
@@ -65,13 +80,14 @@
             e.preventDefault();
 
             if (isYouTube) {
+                const cleanUrl = cleanYouTubeUrl(window.location.href);
                 const videoTitle = (document.title || "YouTube Video").replace(" - YouTube", "").trim();
                 const proceed = confirm(`Download this YouTube video in Full HD with audio?\n\n"${videoTitle}"\n\nFile will be saved to your Downloads folder.`);
                 if (!proceed) return;
 
                 const label = btn.querySelector("span:last-child");
                 label.textContent = "⏳ Sending to JDM...";
-                triggerIdmDownload(window.location.href, videoTitle + ".mp4", btn);
+                triggerIdmDownload(cleanUrl, videoTitle + ".mp4", btn);
                 return;
             }
 
@@ -196,6 +212,23 @@
                 setTimeout(() => { label.textContent = "Download this video"; }, 2500);
             }
         });
+    }
+
+    function cleanYouTubeUrl(url) {
+        try {
+            const u = new URL(url);
+            const v = u.searchParams.get("v");
+            if (v) return `https://www.youtube.com/watch?v=${v}`;
+            if (u.pathname.startsWith("/shorts/")) {
+                const id = u.pathname.split("/")[2];
+                if (id) return `https://www.youtube.com/watch?v=${id}`;
+            }
+            if (u.hostname === "youtu.be") {
+                const id = u.pathname.substring(1);
+                if (id) return `https://www.youtube.com/watch?v=${id}`;
+            }
+        } catch (e) {}
+        return url;
     }
 
     function isValidHttpUrl(url) {
