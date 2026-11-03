@@ -263,30 +263,65 @@ public class AddDownloadDialog extends JDialog {
 
     public static void launchYouTubeDownloader(String url) {
         try {
-            java.io.File bat = new java.io.File("download_youtube.bat");
-            if (!bat.exists()) {
-                bat = new java.io.File(System.getProperty("user.dir"), "download_youtube.bat");
+            // Write URL to temporary file to prevent cmd escaping, & ampersand, and = equal sign truncation
+            if (url != null && !url.trim().isEmpty()) {
+                java.io.File tempFile = new java.io.File(System.getProperty("java.io.tmpdir"), "jdm_yt_url.txt");
+                java.nio.file.Files.writeString(tempFile.toPath(), url.trim(), java.nio.charset.StandardCharsets.UTF_8);
             }
-            if (!bat.exists()) {
+
+            java.io.File bat = null;
+
+            // 1. Current working directory
+            java.io.File f1 = new java.io.File("download_youtube.bat");
+            if (f1.exists()) bat = f1;
+
+            // 2. Directory containing running JAR
+            if (bat == null) {
                 try {
-                    String jarPath = AddDownloadDialog.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-                    if (jarPath != null) {
-                        java.io.File jarDir = new java.io.File(jarPath).getParentFile();
-                        java.io.File candidate = new java.io.File(jarDir, "download_youtube.bat");
-                        if (candidate.exists()) bat = candidate;
-                    }
+                    java.io.File jarFile = new java.io.File(AddDownloadDialog.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+                    java.io.File jarDir = jarFile.isFile() ? jarFile.getParentFile() : jarFile;
+                    java.io.File candidate = new java.io.File(jarDir, "download_youtube.bat");
+                    if (candidate.exists()) bat = candidate;
                 } catch (Exception ignored) {}
             }
 
+            // 3. User scratch directory
+            if (bat == null) {
+                String userHome = System.getProperty("user.home");
+                if (userHome != null) {
+                    java.io.File candidate = new java.io.File(userHome, ".gemini\\antigravity\\scratch\\JavaDownloadManager\\download_youtube.bat");
+                    if (candidate.exists()) bat = candidate;
+                }
+            }
+
+            // 4. AppData directory
+            if (bat == null) {
+                String appData = System.getenv("APPDATA");
+                if (appData != null) {
+                    java.io.File candidate = new java.io.File(appData, "JavaDownloadManager\\download_youtube.bat");
+                    if (candidate.exists()) bat = candidate;
+                }
+            }
+
+            if (bat == null || !bat.exists()) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Could not find download_youtube.bat in JDM directory.\nPlease make sure download_youtube.bat is present in your JDM folder.",
+                    "YouTube Downloader",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            // Launch visible console window to show real-time progress and diagnostics
             java.util.List<String> command = new java.util.ArrayList<>();
             command.add("cmd.exe");
             command.add("/c");
             command.add("start");
-            command.add("JDM YouTube Downloader");
-            command.add(bat.getAbsolutePath());
-            if (url != null && !url.trim().isEmpty()) {
-                command.add(url.trim());
-            }
+            command.add("JDM YouTube Video Downloader");
+            command.add("cmd.exe");
+            command.add("/c");
+            command.add("\"" + bat.getAbsolutePath() + "\"");
 
             ProcessBuilder pb = new ProcessBuilder(command);
             if (bat.getParentFile() != null) {

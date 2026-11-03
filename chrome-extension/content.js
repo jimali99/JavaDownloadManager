@@ -188,10 +188,11 @@
             const label = btn.querySelector("span:last-child");
             if (res && res.success) {
                 const old = label.textContent;
-                label.textContent = "✓ Sent to JDM!";
-                setTimeout(() => { label.textContent = old; }, 2500);
+                label.textContent = "✓ Starting in JDM...";
+                setTimeout(() => { label.textContent = old; }, 3500);
             } else {
-                label.textContent = "JDM Offline (Open JDM)";
+                label.textContent = "JDM Offline";
+                alert("Java Download Manager is not currently running!\n\nPlease open Java Download Manager on your PC (run.bat or IDM-Java.jar), then click Download again.");
                 setTimeout(() => { label.textContent = "Download this video"; }, 2500);
             }
         });

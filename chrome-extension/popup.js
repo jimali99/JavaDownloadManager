@@ -134,6 +134,7 @@ async function loadDetectedVideos() {
                             dlBtn.disabled = false;
                             dlBtn.textContent = "Offline";
                             showToast("JDM is offline. Start Java Download Manager on your PC.");
+                            alert("Java Download Manager is not currently running!\n\nPlease start Java Download Manager on your PC (run.bat or IDM-Java.jar), then click Download again.");
                         }
                     });
                 });
