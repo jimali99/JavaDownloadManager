@@ -14,11 +14,16 @@ const MEDIA_MIMES = [
 // Initialize on installation
 chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.local.get({
-        interceptDownloads: true,
+        interceptDownloads: false,
         autoStart: false,
         detectVideos: true
     }, (settings) => {
-        chrome.storage.local.set(settings);
+        // Enforce safe defaults: do not automatically intercept browser downloads without user consent
+        chrome.storage.local.set({
+            interceptDownloads: false,
+            autoStart: false,
+            detectVideos: true
+        });
     });
 
     createContextMenus();
@@ -82,9 +87,22 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 // Automatic Chrome Download Interception
 chrome.downloads.onCreated.addListener(async (downloadItem) => {
-    const settings = await chrome.storage.local.get({ interceptDownloads: true, autoStart: true });
+    const settings = await chrome.storage.local.get({ interceptDownloads: false, autoStart: false });
     if (!settings.interceptDownloads) {
         return;
+    }
+
+    // CRITICAL: Strictly ignore completed, interrupted, or past downloads from history
+    if (downloadItem.state && downloadItem.state !== "in_progress") {
+        return;
+    }
+
+    // Ignore downloads that were created more than 4 seconds ago (restored from browser history)
+    if (downloadItem.startTime) {
+        const elapsed = Date.now() - new Date(downloadItem.startTime).getTime();
+        if (elapsed > 4000) {
+            return;
+        }
     }
 
     const url = downloadItem.finalUrl || downloadItem.url;

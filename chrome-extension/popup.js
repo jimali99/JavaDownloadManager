@@ -18,10 +18,10 @@ const videoList = document.getElementById("videoList");
 document.addEventListener("DOMContentLoaded", async () => {
     // Load stored settings
     chrome.storage.local.get({
-        interceptDownloads: true,
+        interceptDownloads: false,
         autoStart: false
     }, (items) => {
-        chkIntercept.checked = items.interceptDownloads;
+        chkIntercept.checked = items.interceptDownloads === true;
         chkAutoStart.checked = items.autoStart === true;
     });
 
