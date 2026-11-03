@@ -66,6 +66,9 @@
 
             if (isYouTube) {
                 const videoTitle = (document.title || "YouTube Video").replace(" - YouTube", "").trim();
+                const proceed = confirm(`Download this YouTube video in Full HD with audio?\n\n"${videoTitle}"\n\nFile will be saved to your Downloads folder.`);
+                if (!proceed) return;
+
                 const label = btn.querySelector("span:last-child");
                 label.textContent = "⏳ Sending to JDM...";
                 triggerIdmDownload(window.location.href, videoTitle + ".mp4", btn);

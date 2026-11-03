@@ -19,10 +19,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Load stored settings
     chrome.storage.local.get({
         interceptDownloads: true,
-        autoStart: true
+        autoStart: false
     }, (items) => {
         chkIntercept.checked = items.interceptDownloads;
-        chkAutoStart.checked = items.autoStart;
+        chkAutoStart.checked = items.autoStart === true;
     });
 
     // Save settings when changed

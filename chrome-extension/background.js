@@ -15,7 +15,7 @@ const MEDIA_MIMES = [
 chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.local.get({
         interceptDownloads: true,
-        autoStart: true,
+        autoStart: false,
         detectVideos: true
     }, (settings) => {
         chrome.storage.local.set(settings);
