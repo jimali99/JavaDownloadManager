@@ -169,10 +169,10 @@
             const label = btn.querySelector("span:last-child");
             if (res && res.success) {
                 const old = label.textContent;
-                label.textContent = "✓ Sent to IDM!";
+                label.textContent = "✓ Sent to JDM!";
                 setTimeout(() => { label.textContent = old; }, 2500);
             } else {
-                label.textContent = "IDM Offline (Open IDM)";
+                label.textContent = "JDM Offline (Open JDM)";
                 setTimeout(() => { label.textContent = "Download this video"; }, 2500);
             }
         });

@@ -29,25 +29,25 @@ function createContextMenus() {
     chrome.contextMenus.removeAll(() => {
         chrome.contextMenus.create({
             id: "idm_download_link",
-            title: "Download with IDM",
+            title: "Download with JDM",
             contexts: ["link"]
         });
 
         chrome.contextMenus.create({
             id: "idm_download_media",
-            title: "Download video / media with IDM",
+            title: "Download video / media with JDM",
             contexts: ["video", "audio", "image"]
         });
 
         chrome.contextMenus.create({
             id: "idm_download_selection",
-            title: "Download selected link with IDM",
+            title: "Download selected link with JDM",
             contexts: ["selection"]
         });
 
         chrome.contextMenus.create({
             id: "idm_download_page",
-            title: "Download current page with IDM",
+            title: "Download current page with JDM",
             contexts: ["page"]
         });
     });
@@ -104,7 +104,7 @@ chrome.downloads.onCreated.addListener(async (downloadItem) => {
 
     const isOnline = await checkIdmStatus();
     if (!isOnline) {
-        console.log("IDM is offline; allowing Chrome to download normally.");
+        console.log("JDM is offline; allowing Chrome to download normally.");
         return;
     }
 
@@ -115,7 +115,7 @@ chrome.downloads.onCreated.addListener(async (downloadItem) => {
         const filename = downloadItem.filename ? downloadItem.filename.replace(/^.*[\\\/]/, '') : "";
         const sent = await sendDownloadToIdm(url, filename, settings.autoStart);
         if (sent) {
-            notifyUser("IDM Download Started", `Transferred "${filename || 'File'}" to IDM.`);
+            notifyUser("JDM Download Started", `Transferred "${filename || 'File'}" to JDM.`);
         }
     } catch (err) {
         console.error("Error intercepting download:", err);
@@ -279,11 +279,11 @@ async function sendDownloadToIdm(url, filename = "", autoStart = true) {
             updateExtensionBadge(true);
             return true;
         } else {
-            notifyUser("IDM Error", "IDM rejected the download request.");
+            notifyUser("JDM Error", "JDM rejected the download request.");
             return false;
         }
     } catch (err) {
-        notifyUser("IDM Not Running", "Please start Internet Download Manager on your PC first.");
+        notifyUser("JDM Not Running", "Please start Java Download Manager on your PC first.");
         updateExtensionBadge(false);
         return false;
     }

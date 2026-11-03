@@ -1,7 +1,7 @@
 @echo off
 setlocal
 echo ========================================================
-echo  IDM Chrome Extension Quick Installer
+echo  Java Download Manager (JDM) Chrome Extension Quick Installer
 echo ========================================================
 echo.
 set "EXT_DIR=%~dp0chrome-extension"

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "IDM Integration Module (Java Accelerated)",
+  "name": "Java Download Manager (JDM Integration)",
   "version": "1.1.0",
-  "description": "Seamlessly detects videos, media streams, and redirects Chrome downloads to Internet Download Manager for up to 10x faster multi-threaded speeds.",
+  "description": "Seamlessly detects videos, media streams, and redirects Chrome downloads to Java Download Manager for up to 10x faster multi-threaded speeds.",
   "permissions": [
     "downloads",
     "contextMenus",
@@ -35,7 +35,7 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     },
-    "default_title": "IDM Download Accelerator & Video Sniffer"
+    "default_title": "Java Download Manager (JDM Video Sniffer)"
   },
   "icons": {
     "16": "icons/icon16.png",

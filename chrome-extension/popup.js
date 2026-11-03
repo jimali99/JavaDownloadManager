@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             await fetch(`${IDM_API_URL}/bring-to-front`);
             window.close();
         } catch (e) {
-            showToast("IDM is not running. Please start IDM on your PC.");
+            showToast("JDM is not running. Please start Java Download Manager on your PC.");
         }
     });
 
@@ -139,10 +139,10 @@ async function loadDetectedVideos() {
                     }, (res) => {
                         if (res && res.success) {
                             dlBtn.textContent = "✓ Sent!";
-                            showToast("Video sent to IDM!");
+                            showToast("Video sent to JDM!");
                         } else {
                             dlBtn.textContent = "Offline";
-                            showToast("IDM is offline. Start IDM on your PC.");
+                            showToast("JDM is offline. Start Java Download Manager on your PC.");
                         }
                     });
                 });
@@ -171,10 +171,10 @@ async function checkStatus() {
             activeCount.textContent = data.activeTasks || 0;
             totalSpeed.textContent = data.totalSpeed || "0 KB/s";
         } else {
-            setStatus("offline", "IDM Offline");
+            setStatus("offline", "JDM Offline");
         }
     } catch (e) {
-        setStatus("offline", "IDM Offline");
+        setStatus("offline", "JDM Offline");
         activeCount.textContent = "0";
         totalSpeed.textContent = "0 KB/s";
     }
@@ -199,7 +199,7 @@ async function startDownload() {
     }
 
     btnDownload.disabled = true;
-    btnDownload.innerHTML = "<span>⏳ Sending to IDM...</span>";
+    btnDownload.innerHTML = "<span>⏳ Sending to JDM...</span>";
 
     try {
         const res = await fetch(`${IDM_API_URL}/add-download`, {
@@ -212,19 +212,19 @@ async function startDownload() {
         });
 
         if (res.ok) {
-            showToast("✓ Download sent to IDM!");
+            showToast("✓ Download sent to JDM!");
             urlInput.value = "";
             setTimeout(() => {
                 window.close();
             }, 800);
         } else {
-            showToast("Failed to add download. IDM returned an error.");
+            showToast("Failed to add download. JDM returned an error.");
         }
     } catch (e) {
-        showToast("Cannot connect to IDM. Make sure IDM is running on your PC.");
+        showToast("Cannot connect to JDM. Make sure Java Download Manager is running on your PC.");
     } finally {
         btnDownload.disabled = false;
-        btnDownload.innerHTML = "<span>⬇ Download with IDM</span>";
+        btnDownload.innerHTML = "<span>⬇ Download with JDM</span>";
     }
 }
 
