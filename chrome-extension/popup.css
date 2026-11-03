@@ -33,6 +33,14 @@ body {
     gap: 10px;
 }
 
+.logo-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+}
+
 .logo-icon {
     width: 32px;
     height: 32px;

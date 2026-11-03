@@ -493,6 +493,72 @@ public class AppIcons {
         return new ImageIcon(img);
     }
 
+    public static java.util.List<Image> getAppIconImages() {
+        java.util.List<Image> icons = new java.util.ArrayList<>();
+        int[] sizes = {16, 24, 32, 48, 64, 128, 256};
+        for (int size : sizes) {
+            Image img = loadResourceImage("/resources/icon" + size + ".png");
+            if (img == null) {
+                img = loadResourceImage("/icon" + size + ".png");
+            }
+            if (img != null) {
+                icons.add(img);
+            }
+        }
+        if (icons.isEmpty()) {
+            Image logo = getAppLogoImage();
+            if (logo != null) icons.add(logo);
+        }
+        return icons;
+    }
+
+    public static Image getAppLogoImage() {
+        Image img = loadResourceImage("/resources/logo.png");
+        if (img == null) img = loadResourceImage("/logo.png");
+        if (img == null) img = loadResourceImage("/resources/icon64.png");
+        return img;
+    }
+
+    public static Image getBannerImage() {
+        Image img = loadResourceImage("/resources/logo-banner.png");
+        if (img == null) img = loadResourceImage("/logo-banner.png");
+        return img;
+    }
+
+    public static Icon getLogoIcon(int width, int height) {
+        Image img = getAppLogoImage();
+        if (img != null) {
+            return new ImageIcon(img.getScaledInstance(width, height, Image.SCALE_SMOOTH));
+        }
+        return getCategoryIcon(DownloadCategory.DOWNLOADING, width);
+    }
+
+    private static Image loadResourceImage(String path) {
+        try {
+            java.io.InputStream in = AppIcons.class.getResourceAsStream(path);
+            if (in == null) {
+                in = AppIcons.class.getClassLoader().getResourceAsStream(path.startsWith("/") ? path.substring(1) : path);
+            }
+            if (in != null) {
+                try {
+                    return javax.imageio.ImageIO.read(in);
+                } finally {
+                    in.close();
+                }
+            }
+            String clean = path.startsWith("/") ? path.substring(1) : path;
+            java.io.File file = new java.io.File(clean);
+            if (file.exists()) {
+                return javax.imageio.ImageIO.read(file);
+            }
+            file = new java.io.File("resources/" + new java.io.File(clean).getName());
+            if (file.exists()) {
+                return javax.imageio.ImageIO.read(file);
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
+
     private static void setupGraphics(Graphics2D g2) {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);

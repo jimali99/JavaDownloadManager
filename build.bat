@@ -37,6 +37,13 @@ cd bin
 "%JAR_CMD%" xf "..\flatlaf-3.5.4.jar"
 cd ..
 
+echo [2.5/3] Bundling application icons and logo resources...
+if not exist "bin\resources" mkdir "bin\resources"
+if exist "resources" (
+    xcopy /s /y /q "resources\*" "bin\resources\" >nul
+    xcopy /y /q "resources\*.png" "bin\" >nul
+)
+
 echo [3/3] Packaging standalone IDM-Java.jar...
 "%JAR_CMD%" cfe "IDM-Java.jar" com.idm.Main -C bin .
 if %errorlevel% neq 0 (

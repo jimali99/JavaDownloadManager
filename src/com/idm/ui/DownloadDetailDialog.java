@@ -40,6 +40,11 @@ public class DownloadDetailDialog extends JDialog implements DownloadTask.Downlo
         this.queueManager = queueManager;
         this.visualizerPanel = new SegmentVisualizerPanel(task);
 
+        java.util.List<Image> appIcons = AppIcons.getAppIconImages();
+        if (!appIcons.isEmpty()) {
+            setIconImages(appIcons);
+        }
+
         initUI();
         task.addListener(this);
 

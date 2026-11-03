@@ -35,6 +35,11 @@ public class AddDownloadDialog extends JDialog {
         this.queueManager = queueManager;
         this.settings = settings;
 
+        java.util.List<Image> appIcons = AppIcons.getAppIconImages();
+        if (!appIcons.isEmpty()) {
+            setIconImages(appIcons);
+        }
+
         initUI();
 
         if (initialUrl != null && !initialUrl.trim().isEmpty()) {

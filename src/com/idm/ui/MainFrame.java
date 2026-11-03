@@ -49,10 +49,15 @@ public class MainFrame extends JFrame {
     }
 
     public MainFrame(AppSettings settings, DownloadQueueManager queueManager, ClipboardMonitor clipboardMonitor) {
-        super("Internet Download Manager (IDM Pro - Java Accelerated)");
+        super("JDM — Java Download Manager (Accelerated Pro)");
         this.settings = settings;
         this.queueManager = queueManager;
         this.clipboardMonitor = clipboardMonitor;
+
+        java.util.List<Image> appIcons = AppIcons.getAppIconImages();
+        if (!appIcons.isEmpty()) {
+            setIconImages(appIcons);
+        }
 
         initUI();
         initSystemTray();
@@ -109,10 +114,39 @@ public class MainFrame extends JFrame {
         });
 
         JPanel leftPanel = new JPanel(new BorderLayout());
+
+        // JDM Brand header in sidebar
+        JPanel brandHeader = new JPanel(new BorderLayout(10, 0));
+        brandHeader.setBorder(new EmptyBorder(12, 14, 12, 14));
+        brandHeader.setBackground(UIManager.getColor("Panel.background"));
+
+        Image logoImg = AppIcons.getAppLogoImage();
+        if (logoImg != null) {
+            ImageIcon logoIcon = new ImageIcon(logoImg.getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+            brandHeader.add(new JLabel(logoIcon), BorderLayout.WEST);
+        }
+
+        JPanel brandTextPanel = new JPanel(new GridLayout(2, 1, 0, 2));
+        brandTextPanel.setOpaque(false);
+        JLabel brandTitle = new JLabel("JDM Pro");
+        brandTitle.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        JLabel brandSub = new JLabel("Java Download Manager");
+        brandSub.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        brandSub.setForeground(UIManager.getColor("Label.disabledForeground"));
+        brandTextPanel.add(brandTitle);
+        brandTextPanel.add(brandSub);
+        brandHeader.add(brandTextPanel, BorderLayout.CENTER);
+
+        JPanel sidebarTop = new JPanel(new BorderLayout());
+        sidebarTop.add(brandHeader, BorderLayout.NORTH);
+        sidebarTop.add(new JSeparator(), BorderLayout.CENTER);
+
         JLabel lblCatTitle = new JLabel(" Categories");
-        lblCatTitle.setFont(lblCatTitle.getFont().deriveFont(Font.BOLD, 12f));
-        lblCatTitle.setBorder(new EmptyBorder(8, 10, 8, 10));
-        leftPanel.add(lblCatTitle, BorderLayout.NORTH);
+        lblCatTitle.setFont(lblCatTitle.getFont().deriveFont(Font.BOLD, 11f));
+        lblCatTitle.setBorder(new EmptyBorder(8, 12, 6, 12));
+        sidebarTop.add(lblCatTitle, BorderLayout.SOUTH);
+
+        leftPanel.add(sidebarTop, BorderLayout.NORTH);
         leftPanel.add(new JScrollPane(categoryList), BorderLayout.CENTER);
 
         splitPane.setLeftComponent(leftPanel);
@@ -224,25 +258,8 @@ public class MainFrame extends JFrame {
 
         // Help Menu
         JMenu mHelp = new JMenu("Help");
-        JMenuItem miAbout = new JMenuItem("About IDM Accelerated...", AppIcons.getCategoryIcon(DownloadCategory.ALL, 16));
-        miAbout.addActionListener(e -> {
-            JOptionPane.showMessageDialog(
-                this,
-                "<html><h2>Internet Download Manager (IDM Pro)</h2>" +
-                "<p>High-Performance Multi-Connection Download Accelerator built in Java 26.</p>" +
-                "<p><b>Features:</b></p>" +
-                "<ul>" +
-                "<li>Dynamic Multi-Segment parallel downloading (up to 32 connections)</li>" +
-                "<li>Full Pause & Resume capability on supporting servers</li>" +
-                "<li>Zero-assembly zero-copy direct FileChannel positioning</li>" +
-                "<li>Real-time segment visualization</li>" +
-                "<li>Clipboard link detection and sound alerts</li>" +
-                "</ul>" +
-                "</html>",
-                "About IDM Java",
-                JOptionPane.INFORMATION_MESSAGE
-            );
-        });
+        JMenuItem miAbout = new JMenuItem("About JDM Pro...", AppIcons.getLogoIcon(16, 16));
+        miAbout.addActionListener(e -> showAboutDialog());
         mHelp.add(miAbout);
 
         mb.add(mTasks);
@@ -390,16 +407,11 @@ public class MainFrame extends JFrame {
 
         try {
             SystemTray tray = SystemTray.getSystemTray();
-            Image img = getDefaultIconImage();
-            try {
-                java.net.URL iconUrl = getClass().getResource("/icon.png");
-                if (iconUrl != null) {
-                    img = new ImageIcon(iconUrl).getImage();
-                }
-            } catch (Exception ignored) {}
+            Image img = AppIcons.getAppLogoImage();
+            if (img == null) img = getDefaultIconImage();
 
             PopupMenu popup = new PopupMenu();
-            MenuItem miOpen = new MenuItem("Open IDM");
+            MenuItem miOpen = new MenuItem("Open JDM Pro");
             miOpen.addActionListener(e -> {
                 setVisible(true);
                 setExtendedState(JFrame.NORMAL);
@@ -417,7 +429,7 @@ public class MainFrame extends JFrame {
             popup.addSeparator();
             popup.add(miExit);
 
-            trayIcon = new TrayIcon(img, "Internet Download Manager", popup);
+            trayIcon = new TrayIcon(img, "JDM — Java Download Manager", popup);
             trayIcon.setImageAutoSize(true);
             trayIcon.addActionListener(e -> {
                 setVisible(true);
@@ -428,6 +440,31 @@ public class MainFrame extends JFrame {
             tray.add(trayIcon);
 
         } catch (Exception ignored) {}
+    }
+
+    private void showAboutDialog() {
+        JPanel panel = new JPanel(new BorderLayout(0, 14));
+        panel.setBorder(new EmptyBorder(6, 6, 6, 6));
+
+        Image banner = AppIcons.getBannerImage();
+        if (banner != null) {
+            Image scaledBanner = banner.getScaledInstance(460, 250, Image.SCALE_SMOOTH);
+            JLabel bannerLabel = new JLabel(new ImageIcon(scaledBanner));
+            bannerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            panel.add(bannerLabel, BorderLayout.NORTH);
+        }
+
+        JLabel infoLabel = new JLabel(
+            "<html><div style='text-align: center; font-family: Segoe UI;'>" +
+            "<h2 style='margin: 4px 0; color: #38bdf8;'>JDM — Java Download Manager</h2>" +
+            "<p style='color: #94a3b8; font-size: 11px;'>Version 1.1.0 • High-Performance Java Accelerated Downloader</p>" +
+            "<p style='margin-top: 8px;'>Featuring multi-segment parallel HTTP byte-range connections, zero-copy FileChannel writes, dynamic pause/resume, and Chrome Extension integration.</p>" +
+            "</div></html>"
+        );
+        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(infoLabel, BorderLayout.CENTER);
+
+        JOptionPane.showMessageDialog(this, panel, "About JDM Pro", JOptionPane.PLAIN_MESSAGE);
     }
 
     private Image getDefaultIconImage() {

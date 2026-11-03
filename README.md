@@ -1,6 +1,21 @@
-# Internet Download Manager (IDM Pro - Java Accelerated Edition)
+<p align="center">
+  <img src="assets/logo-banner.png" alt="JDM - Java Download Manager" width="850">
+</p>
 
-A high-performance, multi-threaded file download manager written in pure Java (Java 26 / 11+) designed specifically for Windows PCs to accelerate download speeds up to 5x-10x, exactly like the iconic **Internet Download Manager (IDM)**.
+<h1 align="center">JDM — Java Download Manager (Accelerated Pro)</h1>
+
+<p align="center">
+  <strong>High-Performance Multi-Threaded File Download Accelerator for Windows</strong><br>
+  <em>Accelerate download speeds up to 5x-10x with dynamic connection segmentation, zero-copy assembly, and Chrome browser integration.</em>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-26%20%7C%2017%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java">
+  <img src="https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows">
+  <img src="https://img.shields.io/badge/Chrome_Extension-Manifest_V3-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Chrome Extension">
+  <img src="https://img.shields.io/badge/UI-FlatLaf%20Modern%20Dark-10b981?style=for-the-badge" alt="FlatLaf">
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
+</p>
 
 ---
 
