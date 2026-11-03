@@ -20,30 +20,38 @@
 
     // Attach to video elements on page
     function scanAndAttachButtons() {
+        const isYouTube = window.location.hostname.includes("youtube.com") || window.location.hostname.includes("youtu.be");
+
         const videos = document.querySelectorAll("video");
         videos.forEach((video) => {
             if (video.dataset.idmAttached) return;
 
-            // Make parent position relative so our absolute button aligns nicely
-            const parent = video.parentElement;
+            let parent = video.parentElement;
+            if (isYouTube) {
+                const playerContainer = video.closest(".html5-video-player") || video.closest("#player") || video.parentElement;
+                if (playerContainer) parent = playerContainer;
+            }
             if (!parent) return;
 
             // Avoid attaching inside tiny icons or invisible videos
             const rect = video.getBoundingClientRect();
             if (rect.width > 0 && rect.width < 120 && rect.height < 90) return;
 
-            attachIdmButton(video, parent);
+            attachIdmButton(video, parent, isYouTube);
         });
     }
 
-    function attachIdmButton(video, container) {
+    function attachIdmButton(video, container, isYouTube = false) {
         video.dataset.idmAttached = "true";
 
         const btn = document.createElement("div");
         btn.className = "idm-video-download-btn";
+        if (isYouTube) {
+            btn.classList.add("idm-youtube-btn");
+        }
         btn.innerHTML = `
             <span class="idm-btn-icon">⬇</span>
-            <span>Download this video</span>
+            <span>${isYouTube ? "Download YouTube Video" : "Download this video"}</span>
         `;
 
         const dropdown = document.createElement("div");
@@ -55,6 +63,14 @@
         btn.addEventListener("click", (e) => {
             e.stopPropagation();
             e.preventDefault();
+
+            if (isYouTube) {
+                const videoTitle = (document.title || "YouTube Video").replace(" - YouTube", "").trim();
+                const label = btn.querySelector("span:last-child");
+                label.textContent = "⏳ Sending to JDM...";
+                triggerIdmDownload(window.location.href, videoTitle + ".mp4", btn);
+                return;
+            }
 
             const sources = collectVideoSources(video);
             if (sources.length === 0) {
@@ -206,6 +222,11 @@
     observer.observe(document.body || document.documentElement, {
         childList: true,
         subtree: true
+    });
+
+    // Listen for YouTube single-page navigation
+    window.addEventListener("yt-navigate-finish", () => {
+        setTimeout(scanAndAttachButtons, 1000);
     });
 
     // Initial scan

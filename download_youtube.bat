@@ -56,13 +56,14 @@ if %errorlevel% equ 0 (
     echo ========================================================
     echo  SUCCESS! Video downloaded to your Downloads folder!
     echo ========================================================
+    echo Auto-closing in 3 seconds...
+    timeout /t 3 >nul
+    exit /b 0
 ) else (
     echo.
     echo ========================================================
     echo  [!] Download failed.
     echo  Please ensure the YouTube link is public and valid.
     echo ========================================================
+    pause
 )
-
-echo.
-pause

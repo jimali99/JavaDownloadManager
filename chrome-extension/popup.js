@@ -94,16 +94,59 @@ async function loadDetectedVideos() {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         if (!tab || !tab.id) return;
 
-        chrome.runtime.sendMessage({ type: "GET_TAB_MEDIA", tabId: tab.id }, (response) => {
-            const list = (response && response.media) ? response.media : [];
-            videoCount.textContent = list.length;
+        const isYouTube = tab.url && (tab.url.includes("youtube.com/watch") || tab.url.includes("youtu.be/") || tab.url.includes("youtube.com/shorts/"));
 
-            if (list.length === 0) {
+        chrome.runtime.sendMessage({ type: "GET_TAB_MEDIA", tabId: tab.id }, (response) => {
+            const list = (response && response.media) ? [...response.media] : [];
+            videoList.innerHTML = "";
+
+            if (isYouTube) {
+                videoCount.textContent = Math.max(1, list.length);
+                const cleanTitle = (tab.title || "YouTube Video").replace(" - YouTube", "").trim();
+
+                const card = document.createElement("div");
+                card.className = "video-card";
+                card.style.borderColor = "#ef4444";
+                card.innerHTML = `
+                    <div class="video-card-info">
+                        <span class="video-card-title" title="${escapeHtml(tab.url)}">🎬 ${escapeHtml(cleanTitle)}</span>
+                        <div class="video-card-meta">
+                            <span class="badge-format" style="background:#dc2626;color:#ffffff;font-weight:bold;">YOUTUBE HD</span>
+                            <span>Full Video + Audio (.mp4)</span>
+                        </div>
+                    </div>
+                    <button class="btn-video-dl" style="background: linear-gradient(135deg, #dc2626, #ef4444);">⬇ Download</button>
+                `;
+
+                const dlBtn = card.querySelector(".btn-video-dl");
+                dlBtn.addEventListener("click", () => {
+                    dlBtn.disabled = true;
+                    dlBtn.textContent = "⏳ Starting...";
+                    chrome.runtime.sendMessage({
+                        type: "DOWNLOAD_MEDIA_ITEM",
+                        url: tab.url,
+                        filename: cleanTitle + ".mp4"
+                    }, (res) => {
+                        if (res && res.success) {
+                            dlBtn.textContent = "✓ Sent!";
+                            showToast("🎬 YouTube video sent to JDM! Check your Downloads folder.");
+                        } else {
+                            dlBtn.disabled = false;
+                            dlBtn.textContent = "Offline";
+                            showToast("JDM is offline. Start Java Download Manager on your PC.");
+                        }
+                    });
+                });
+                videoList.appendChild(card);
+            } else {
+                videoCount.textContent = list.length;
+            }
+
+            if (!isYouTube && list.length === 0) {
                 videoList.innerHTML = `<div class="no-videos">No active video streams detected yet.<br>Play a video on this page to capture it.</div>`;
                 return;
             }
 
-            videoList.innerHTML = "";
             list.forEach((media, i) => {
                 const card = document.createElement("div");
                 card.className = "video-card";
@@ -141,6 +184,7 @@ async function loadDetectedVideos() {
                             dlBtn.textContent = "✓ Sent!";
                             showToast("Video sent to JDM!");
                         } else {
+                            dlBtn.disabled = false;
                             dlBtn.textContent = "Offline";
                             showToast("JDM is offline. Start Java Download Manager on your PC.");
                         }

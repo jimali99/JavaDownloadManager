@@ -33,6 +33,14 @@
     box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
+.idm-video-download-btn.idm-youtube-btn {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.idm-video-download-btn.idm-youtube-btn:hover {
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
 .idm-video-download-btn .idm-btn-icon {
     font-size: 13px;
     display: inline-block;
