@@ -68,7 +68,11 @@ public class MainFrame extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                exitApp();
+                if (SystemTray.isSupported() && trayIcon != null && settings.isMinimizeToTrayOnClose()) {
+                    setVisible(false);
+                } else {
+                    exitApp();
+                }
             }
         });
 

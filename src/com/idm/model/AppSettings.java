@@ -18,6 +18,7 @@ public class AppSettings implements Serializable {
     private boolean darkMode;
     private int speedLimitKBps;
     private String userAgent;
+    private boolean minimizeToTrayOnClose;
 
     public AppSettings() {
         String home = System.getProperty("user.home", ".");
@@ -33,6 +34,15 @@ public class AppSettings implements Serializable {
         this.darkMode = true;
         this.speedLimitKBps = 0; // unlimited
         this.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+        this.minimizeToTrayOnClose = true;
+    }
+
+    public boolean isMinimizeToTrayOnClose() {
+        return minimizeToTrayOnClose;
+    }
+
+    public void setMinimizeToTrayOnClose(boolean minimizeToTrayOnClose) {
+        this.minimizeToTrayOnClose = minimizeToTrayOnClose;
     }
 
     public String getDefaultDownloadDir() {
