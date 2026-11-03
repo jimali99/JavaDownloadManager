@@ -72,9 +72,9 @@ echo [2/2] Downloading Full HD video + audio and merging with FFmpeg...
 echo.
 
 if "!USE_PYTHON!"=="1" (
-    python -m yt_dlp !COOKIE_OPT! --no-playlist --js-runtimes node -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b" --merge-output-format mp4 -P "%USERPROFILE%\Downloads" "!VIDEO_URL!"
+    python -m yt_dlp !COOKIE_OPT! --no-playlist --remote-components ejs:github --js-runtimes node -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b" --merge-output-format mp4 -P "%USERPROFILE%\Downloads" "!VIDEO_URL!"
 ) else (
-    "!YTDL_BIN!" !COOKIE_OPT! --no-playlist --js-runtimes node -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b" --merge-output-format mp4 -P "%USERPROFILE%\Downloads" "!VIDEO_URL!"
+    "!YTDL_BIN!" !COOKIE_OPT! --no-playlist --remote-components ejs:github --js-runtimes node -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b" --merge-output-format mp4 -P "%USERPROFILE%\Downloads" "!VIDEO_URL!"
 )
 
 if %errorlevel% equ 0 (
