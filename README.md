@@ -1,4 +1,4 @@
-# Internet Download Manager (IDM Pro - Java Accelerated Edition)
+# Java Download Manager (JDM Pro - Java Accelerated Edition)
 
 A high-performance, multi-threaded file download manager written in pure Java (Java 26 / 11+) designed specifically for Windows PCs to accelerate download speeds up to 5x-10x, exactly like the iconic **Internet Download Manager (IDM)**.
 
@@ -11,7 +11,7 @@ Traditional web browsers download files using a **single TCP connection**, which
 2. Server-side per-connection bandwidth throttling.
 3. Network congestion on individual streams.
 
-### IDM Dynamic File Segmentation:
+### JDM Dynamic File Segmentation:
 1. **Parallel Segment Acceleration (1 to 32 Connections):**
    - Probes the server with HTTP Range requests (`Accept-Ranges: bytes` & HTTP 206 Partial Content).
    - Divides the file into $N$ equal chunks (e.g. 8, 16, or 32 parallel connections).
@@ -27,9 +27,9 @@ Traditional web browsers download files using a **single TCP connection**, which
 
 ---
 
-## 🚀 Key Features Matching IDM
+## 🚀 Key Features Matching JDM
 
-- **IDM Visual Segment Acceleration Bar:**
+- **JDM Visual Segment Acceleration Bar:**
   - Iconic real-time visualization showing live progress and colors for every connection chunk.
   - Per-thread inspection table showing Thread #, Range, Downloaded Bytes, %, Speed, and Status.
 - **Modern Polished Interface:**
@@ -60,7 +60,7 @@ C:\Users\"FOLDER_NAME"\.gemini\antigravity\scratch\JavaDownloadManager\run.bat
 ```
 *(Uses `javaw.exe` so the application opens cleanly without an ugly command prompt console window).*
 
-You can also directly double-click **`IDM-Java.jar`**.
+You can also directly double-click **`JDM-Java.jar`**.
 
 ### Option 2: Create Desktop Shortcut
 Right-click `create_desktop_shortcut.ps1` and select **"Run with PowerShell"**, or execute in PowerShell:
@@ -77,7 +77,7 @@ run.bat https://example.com/file.zip
 
 ---
 
-## 🌐 Chrome Extension (IDM Integration Module)
+## 🌐 Chrome Extension (JDM Integration Module)
 
 A dedicated Chrome Extension (Manifest V3) is included in `chrome-extension/`. It intercepts browser downloads and adds right-click context menus so you can download files with IDM anytime with a single click.
 
@@ -93,7 +93,7 @@ A dedicated Chrome Extension (Manifest V3) is included in `chrome-extension/`. I
   * Right-click any video, audio, or image ➔ **"Download video / media with IDM"**
   * Right-click selected text with a URL ➔ **"Download selected link with IDM"**
 * **Popup Control Center:**
-  * Live status indicator: 🟢 Connected to IDM / 🔴 IDM Offline
+  * Live status indicator: 🟢 Connected to JDM / 🔴 IDM Offline
   * Real-time active download counter and aggregate download speed
   * Quick URL download box (with clipboard paste support)
   * One-click toggle switch to enable/disable automatic interception
@@ -125,7 +125,7 @@ It will recompile with `javac` and generate an updated self-contained `IDM-Java.
 
 ```
 JavaDownloadManager/
-├── IDM-Java.jar                 # Standalone executable FAT-JAR (bundled with FlatLaf)
+├── JDM-Java.jar                 # Standalone executable FAT-JAR (bundled with FlatLaf)
 ├── run.bat                      # Silent launcher script
 ├── build.bat                    # One-click compiler & packager
 ├── create_desktop_shortcut.ps1  # Windows desktop shortcut creator
