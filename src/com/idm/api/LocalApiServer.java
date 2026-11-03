@@ -214,6 +214,18 @@ public class LocalApiServer {
         }
 
         final String downloadUrl = url.trim();
+
+        if (UrlProber.isYouTubeUrl(downloadUrl)) {
+            SwingUtilities.invokeLater(() -> {
+                mainFrame.setVisible(true);
+                mainFrame.setExtendedState(JFrame.NORMAL);
+                mainFrame.toFront();
+                AddDownloadDialog.launchYouTubeDownloader(downloadUrl);
+            });
+            sendResponse(out, 200, "OK", "application/json", "{\"success\":true,\"message\":\"YouTube video sent to JDM YouTube Engine\"}");
+            return;
+        }
+
         final String suggestedFileName = (fileName != null && !fileName.trim().isEmpty()) ? fileName.trim() : null;
         final boolean finalAutoStart = autoStart;
 

@@ -220,6 +220,20 @@ public class MainFrame extends JFrame {
         miAdd.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         miAdd.addActionListener(e -> showAddDialog(null));
 
+        JMenuItem miYouTube = new JMenuItem("Download YouTube Video...", AppIcons.getCategoryIcon(DownloadCategory.VIDEOS, 16));
+        miYouTube.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
+        miYouTube.addActionListener(e -> {
+            String url = JOptionPane.showInputDialog(
+                this,
+                "Enter YouTube video or Shorts link:",
+                "Download YouTube Video",
+                JOptionPane.QUESTION_MESSAGE
+            );
+            if (url != null && !url.trim().isEmpty()) {
+                AddDownloadDialog.launchYouTubeDownloader(url.trim());
+            }
+        });
+
         JMenuItem miResume = new JMenuItem("Resume Download", AppIcons.getResumeIcon(16));
         miResume.addActionListener(e -> resumeSelected());
 
@@ -240,6 +254,7 @@ public class MainFrame extends JFrame {
         miDelete.addActionListener(e -> promptDeleteSelected());
 
         mTasks.add(miAdd);
+        mTasks.add(miYouTube);
         mTasks.addSeparator();
         mTasks.add(miResume);
         mTasks.add(miPause);

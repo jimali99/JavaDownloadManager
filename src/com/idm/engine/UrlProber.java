@@ -46,6 +46,16 @@ public class UrlProber {
         }
     }
 
+    public static boolean isYouTubeUrl(String url) {
+        if (url == null) return false;
+        String lower = url.toLowerCase().trim();
+        return lower.contains("youtube.com/watch") ||
+               lower.contains("youtu.be/") ||
+               lower.contains("youtube.com/shorts/") ||
+               lower.contains("youtube.com/embed/") ||
+               lower.contains("youtube.com/live/");
+    }
+
     public static ProbeResult probe(String targetUrl, String userAgent) throws IOException {
         String currentUrl = targetUrl;
         HttpURLConnection conn = null;

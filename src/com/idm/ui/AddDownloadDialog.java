@@ -3,6 +3,7 @@ package com.idm.ui;
 import com.idm.engine.DownloadQueueManager;
 import com.idm.engine.UrlProber;
 import com.idm.model.AppSettings;
+import com.idm.model.DownloadCategory;
 import com.idm.model.DownloadTask;
 import com.idm.util.FormatUtils;
 
@@ -161,6 +162,16 @@ public class AddDownloadDialog extends JDialog {
         final String url = txtUrl.getText().trim();
         if (url.isEmpty() || probing) return;
 
+        if (UrlProber.isYouTubeUrl(url)) {
+            lblFileSize.setText("YouTube Stream (DASH)");
+            lblResumeSupport.setText("Use JDM YouTube Engine");
+            lblResumeSupport.setForeground(new Color(56, 189, 248));
+            if (txtFileName.getText().trim().isEmpty() || txtFileName.getText().startsWith("download_")) {
+                txtFileName.setText("YouTube_Video.mp4");
+            }
+            return;
+        }
+
         probing = true;
         lblFileSize.setText("Connecting to server...");
         lblResumeSupport.setText("Checking...");
@@ -201,6 +212,28 @@ public class AddDownloadDialog extends JDialog {
             return;
         }
 
+        if (UrlProber.isYouTubeUrl(url)) {
+            int choice = JOptionPane.showOptionDialog(
+                this,
+                "<html><b>YouTube Video Detected!</b><br><br>" +
+                "YouTube streams videos in separate encrypted video and audio tracks.<br>" +
+                "Would you like JDM to download and merge this video in Full HD with audio?</html>",
+                "Download YouTube Video",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                AppIcons.getCategoryIcon(DownloadCategory.VIDEOS, 32),
+                new String[]{"Download with JDM YouTube Engine", "Download Raw URL", "Cancel"},
+                "Download with JDM YouTube Engine"
+            );
+            if (choice == 0) {
+                dispose();
+                launchYouTubeDownloader(url);
+                return;
+            } else if (choice == 2 || choice == JOptionPane.CLOSED_OPTION) {
+                return;
+            }
+        }
+
         String fileName = txtFileName.getText().trim();
         if (fileName.isEmpty()) {
             fileName = "download_" + System.currentTimeMillis();
@@ -225,6 +258,22 @@ public class AddDownloadDialog extends JDialog {
                 DownloadDetailDialog dialog = new DownloadDetailDialog(getOwner(), task, queueManager);
                 dialog.setVisible(true);
             });
+        }
+    }
+
+    public static void launchYouTubeDownloader(String url) {
+        try {
+            java.io.File bat = new java.io.File("download_youtube.bat");
+            if (!bat.exists()) {
+                bat = new java.io.File(System.getProperty("user.dir"), "download_youtube.bat");
+            }
+            String cmd = "cmd /c start \"JDM YouTube Downloader\" \"" + bat.getAbsolutePath() + "\"";
+            if (url != null && !url.trim().isEmpty()) {
+                cmd += " \"" + url.trim() + "\"";
+            }
+            Runtime.getRuntime().exec(cmd);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Could not launch YouTube downloader: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
