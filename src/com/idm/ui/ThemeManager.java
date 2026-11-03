@@ -27,15 +27,18 @@ public class ThemeManager {
             }
 
             // Global UI Tweaks
-            UIManager.put("Button.arc", 8);
-            UIManager.put("Component.arc", 8);
-            UIManager.put("ProgressBar.arc", 6);
-            UIManager.put("TextComponent.arc", 6);
+            UIManager.put("Button.arc", 10);
+            UIManager.put("Component.arc", 10);
+            UIManager.put("ProgressBar.arc", 10);
+            UIManager.put("TextComponent.arc", 8);
             UIManager.put("ScrollBar.showButtons", false);
-            UIManager.put("Table.rowHeight", 32);
+            UIManager.put("ScrollBar.thumbArc", 8);
+            UIManager.put("Table.rowHeight", 36);
             UIManager.put("Table.showHorizontalLines", true);
             UIManager.put("Table.showVerticalLines", false);
             UIManager.put("Table.intercellSpacing", new Dimension(0, 1));
+            UIManager.put("TableHeader.font", new Font("Segoe UI", Font.BOLD, 12));
+            UIManager.put("TableHeader.height", 32);
 
             // Set system font
             Font font = new Font("Segoe UI", Font.PLAIN, 13);

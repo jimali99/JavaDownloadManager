@@ -62,7 +62,8 @@ public class DownloadDetailDialog extends JDialog implements DownloadTask.Downlo
         // Top Header
         JPanel headerPanel = new JPanel(new BorderLayout(10, 5));
         lblFileName.setFont(lblFileName.getFont().deriveFont(Font.BOLD, 15f));
-        lblFileName.setIcon(UIManager.getIcon("FileView.fileIcon"));
+        lblFileName.setIcon(AppIcons.getCategoryIcon(task.getCategory(), 22));
+        lblFileName.setIconTextGap(10);
         headerPanel.add(lblFileName, BorderLayout.NORTH);
 
         // Details grid
@@ -103,6 +104,10 @@ public class DownloadDetailDialog extends JDialog implements DownloadTask.Downlo
 
         // Bottom: Action buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+
+        btnOpenFile.setIcon(AppIcons.getOpenFileIcon(16));
+        btnOpenFolder.setIcon(AppIcons.getOpenFolderIcon(16));
+        btnCancel.setIcon(AppIcons.getStopIcon(16));
 
         btnPauseResume.addActionListener(e -> {
             if (task.getStatus().isActive()) {
@@ -178,21 +183,25 @@ public class DownloadDetailDialog extends JDialog implements DownloadTask.Downlo
             if (status == DownloadStatus.COMPLETED) {
                 lblStatus.setForeground(new Color(34, 197, 94));
                 btnPauseResume.setEnabled(false);
+                btnPauseResume.setIcon(AppIcons.getResumeIcon(16));
                 btnOpenFile.setEnabled(true);
             } else if (status.isActive()) {
                 lblStatus.setForeground(new Color(59, 130, 246));
                 btnPauseResume.setText("Pause");
+                btnPauseResume.setIcon(AppIcons.getPauseIcon(16));
                 btnPauseResume.setEnabled(true);
                 btnOpenFile.setEnabled(false);
             } else if (status == DownloadStatus.PAUSED) {
                 lblStatus.setForeground(new Color(234, 179, 8));
                 btnPauseResume.setText("Resume");
+                btnPauseResume.setIcon(AppIcons.getResumeIcon(16));
                 btnPauseResume.setEnabled(true);
                 btnOpenFile.setEnabled(false);
             } else if (status == DownloadStatus.ERROR) {
                 lblStatus.setForeground(new Color(239, 68, 68));
                 lblStatus.setText("Error: " + (task.getErrorMessage() != null ? task.getErrorMessage() : "Failed"));
                 btnPauseResume.setText("Resume");
+                btnPauseResume.setIcon(AppIcons.getResumeIcon(16));
                 btnOpenFile.setEnabled(false);
             }
 

@@ -33,7 +33,7 @@ public class MainFrame extends JFrame {
     private Timer uiRefreshTimer;
     private TrayIcon trayIcon;
 
-    private static class CategoryItem {
+    static class CategoryItem {
         final DownloadCategory category;
         int count;
 
@@ -44,7 +44,7 @@ public class MainFrame extends JFrame {
 
         @Override
         public String toString() {
-            return category.getIcon() + "  " + category.getDisplayName() + " (" + count + ")";
+            return category.getDisplayName() + " (" + count + ")";
         }
     }
 
@@ -96,7 +96,8 @@ public class MainFrame extends JFrame {
         categoryList = new JList<>(categoryListModel);
         categoryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         categoryList.setSelectedIndex(0);
-        categoryList.setFixedCellHeight(32);
+        categoryList.setFixedCellHeight(36);
+        categoryList.setCellRenderer(new CategoryListCellRenderer());
         categoryList.setBorder(new EmptyBorder(5, 5, 5, 5));
         categoryList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -121,6 +122,8 @@ public class MainFrame extends JFrame {
         downloadTable = new JTable(tableModel);
         downloadTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         downloadTable.setDefaultRenderer(DownloadTask.class, new ProgressCellRenderer());
+        downloadTable.getColumnModel().getColumn(0).setCellRenderer(new TaskCellRenderers.FileNameRenderer(tableModel));
+        downloadTable.getColumnModel().getColumn(2).setCellRenderer(new TaskCellRenderers.StatusRenderer(tableModel));
         downloadTable.getTableHeader().setReorderingAllowed(false);
         downloadTable.setFillsViewportHeight(true);
 
@@ -179,26 +182,26 @@ public class MainFrame extends JFrame {
 
         // Tasks Menu
         JMenu mTasks = new JMenu("Tasks");
-        JMenuItem miAdd = new JMenuItem("Add new download...");
+        JMenuItem miAdd = new JMenuItem("Add new download...", AppIcons.getAddIcon(16));
         miAdd.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         miAdd.addActionListener(e -> showAddDialog(null));
 
-        JMenuItem miResume = new JMenuItem("Resume Download");
+        JMenuItem miResume = new JMenuItem("Resume Download", AppIcons.getResumeIcon(16));
         miResume.addActionListener(e -> resumeSelected());
 
-        JMenuItem miPause = new JMenuItem("Pause Download");
+        JMenuItem miPause = new JMenuItem("Pause Download", AppIcons.getPauseIcon(16));
         miPause.addActionListener(e -> pauseSelected());
 
-        JMenuItem miPauseAll = new JMenuItem("Pause All Active");
+        JMenuItem miPauseAll = new JMenuItem("Pause All Active", AppIcons.getStopIcon(16));
         miPauseAll.addActionListener(e -> queueManager.pauseAll());
 
-        JMenuItem miResumeAll = new JMenuItem("Resume All");
+        JMenuItem miResumeAll = new JMenuItem("Resume All", AppIcons.getResumeIcon(16));
         miResumeAll.addActionListener(e -> queueManager.resumeAll());
 
         JMenuItem miExit = new JMenuItem("Exit");
         miExit.addActionListener(e -> exitApp());
 
-        JMenuItem miDelete = new JMenuItem("Delete Download...");
+        JMenuItem miDelete = new JMenuItem("Delete Download...", AppIcons.getDeleteIcon(16));
         miDelete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         miDelete.addActionListener(e -> promptDeleteSelected());
 
@@ -215,13 +218,13 @@ public class MainFrame extends JFrame {
 
         // Options Menu
         JMenu mOptions = new JMenu("Options");
-        JMenuItem miSettings = new JMenuItem("Configuration & Settings...");
+        JMenuItem miSettings = new JMenuItem("Configuration & Settings...", AppIcons.getSettingsIcon(16));
         miSettings.addActionListener(e -> showSettingsDialog());
         mOptions.add(miSettings);
 
         // Help Menu
         JMenu mHelp = new JMenu("Help");
-        JMenuItem miAbout = new JMenuItem("About IDM Accelerated...");
+        JMenuItem miAbout = new JMenuItem("About IDM Accelerated...", AppIcons.getCategoryIcon(DownloadCategory.ALL, 16));
         miAbout.addActionListener(e -> {
             JOptionPane.showMessageDialog(
                 this,
@@ -252,40 +255,40 @@ public class MainFrame extends JFrame {
     private JToolBar createToolBar() {
         JToolBar tb = new JToolBar();
         tb.setFloatable(false);
-        tb.setBorder(new EmptyBorder(6, 8, 6, 8));
+        tb.setBorder(new EmptyBorder(8, 10, 8, 10));
 
-        JButton btnAdd = createToolButton("➕ Add URL", "Add a new download from URL");
+        JButton btnAdd = createToolButton("Add URL", AppIcons.getAddIcon(18), "Add a new download from URL");
         btnAdd.addActionListener(e -> showAddDialog(null));
 
-        JButton btnResume = createToolButton("▶ Resume", "Resume selected download");
+        JButton btnResume = createToolButton("Resume", AppIcons.getResumeIcon(18), "Resume selected download");
         btnResume.addActionListener(e -> resumeSelected());
 
-        JButton btnPause = createToolButton("⏸ Pause", "Pause selected download");
+        JButton btnPause = createToolButton("Pause", AppIcons.getPauseIcon(18), "Pause selected download");
         btnPause.addActionListener(e -> pauseSelected());
 
-        JButton btnStop = createToolButton("⏹ Stop All", "Pause all active downloads");
+        JButton btnStop = createToolButton("Stop All", AppIcons.getStopIcon(18), "Pause all active downloads");
         btnStop.addActionListener(e -> queueManager.pauseAll());
 
-        JButton btnDelete = createToolButton("🗑 Delete", "Delete selected download (from list or disk)");
+        JButton btnDelete = createToolButton("Delete", AppIcons.getDeleteIcon(18), "Delete selected download (from list or disk)");
         btnDelete.addActionListener(e -> promptDeleteSelected());
 
-        JButton btnOpenFile = createToolButton("📂 Open File", "Open downloaded file");
+        JButton btnOpenFile = createToolButton("Open File", AppIcons.getOpenFileIcon(18), "Open downloaded file");
         btnOpenFile.addActionListener(e -> openSelectedFile());
 
-        JButton btnOpenFolder = createToolButton("📁 Open Folder", "Open download directory");
+        JButton btnOpenFolder = createToolButton("Open Folder", AppIcons.getOpenFolderIcon(18), "Open download directory");
         btnOpenFolder.addActionListener(e -> openSelectedFolder());
 
-        JButton btnSettings = createToolButton("⚙ Options", "Open settings");
+        JButton btnSettings = createToolButton("Options", AppIcons.getSettingsIcon(18), "Open settings");
         btnSettings.addActionListener(e -> showSettingsDialog());
 
         tb.add(btnAdd);
-        tb.addSeparator(new Dimension(8, 20));
+        tb.addSeparator(new Dimension(8, 24));
         tb.add(btnResume);
         tb.add(btnPause);
         tb.add(btnStop);
-        tb.addSeparator(new Dimension(8, 20));
+        tb.addSeparator(new Dimension(8, 24));
         tb.add(btnDelete);
-        tb.addSeparator(new Dimension(8, 20));
+        tb.addSeparator(new Dimension(8, 24));
         tb.add(btnOpenFile);
         tb.add(btnOpenFolder);
         tb.add(Box.createHorizontalGlue());
@@ -294,37 +297,39 @@ public class MainFrame extends JFrame {
         return tb;
     }
 
-    private JButton createToolButton(String text, String tooltip) {
-        JButton btn = new JButton(text);
+    private JButton createToolButton(String text, Icon icon, String tooltip) {
+        JButton btn = new JButton(text, icon);
         btn.setToolTipText(tooltip);
         btn.setFocusable(false);
-        btn.setFont(btn.getFont().deriveFont(12f));
-        btn.setMargin(new Insets(5, 10, 5, 10));
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btn.setIconTextGap(8);
+        btn.setMargin(new Insets(6, 12, 6, 12));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }
 
     private JPopupMenu createContextMenu() {
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem miOpen = new JMenuItem("Open File");
+        JMenuItem miOpen = new JMenuItem("Open File", AppIcons.getOpenFileIcon(16));
         miOpen.addActionListener(e -> openSelectedFile());
 
-        JMenuItem miOpenFolder = new JMenuItem("Open Containing Folder");
+        JMenuItem miOpenFolder = new JMenuItem("Open Containing Folder", AppIcons.getOpenFolderIcon(16));
         miOpenFolder.addActionListener(e -> openSelectedFolder());
 
-        JMenuItem miDetails = new JMenuItem("Download Status / Segment Acceleration...");
+        JMenuItem miDetails = new JMenuItem("Download Status / Segment Acceleration...", AppIcons.getCategoryIcon(DownloadCategory.DOWNLOADING, 16));
         miDetails.addActionListener(e -> openSelectedTaskDetails());
 
-        JMenuItem miResume = new JMenuItem("Resume");
+        JMenuItem miResume = new JMenuItem("Resume", AppIcons.getResumeIcon(16));
         miResume.addActionListener(e -> resumeSelected());
 
-        JMenuItem miPause = new JMenuItem("Pause");
+        JMenuItem miPause = new JMenuItem("Pause", AppIcons.getPauseIcon(16));
         miPause.addActionListener(e -> pauseSelected());
 
-        JMenuItem miRestart = new JMenuItem("Restart from Beginning");
+        JMenuItem miRestart = new JMenuItem("Restart from Beginning", AppIcons.getRestartIcon(16));
         miRestart.addActionListener(e -> restartSelected());
 
-        JMenuItem miCopyUrl = new JMenuItem("Copy URL to Clipboard");
+        JMenuItem miCopyUrl = new JMenuItem("Copy URL to Clipboard", AppIcons.getOpenFileIcon(16));
         miCopyUrl.addActionListener(e -> {
             DownloadTask t = getSelectedTask();
             if (t != null) {
@@ -334,14 +339,14 @@ public class MainFrame extends JFrame {
             }
         });
 
-        JMenuItem miDelete = new JMenuItem("Delete Download...");
+        JMenuItem miDelete = new JMenuItem("Delete Download...", AppIcons.getDeleteIcon(16));
         miDelete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         miDelete.addActionListener(e -> promptDeleteSelected());
 
-        JMenuItem miDeleteFile = new JMenuItem("Permanently Delete File from Disk");
+        JMenuItem miDeleteFile = new JMenuItem("Permanently Delete File from Disk", AppIcons.getDeleteIcon(16));
         miDeleteFile.addActionListener(e -> deleteSelectedTasks(true));
 
-        JMenuItem miRemoveOnly = new JMenuItem("Remove from List Only");
+        JMenuItem miRemoveOnly = new JMenuItem("Remove from List Only", AppIcons.getStopIcon(16));
         miRemoveOnly.addActionListener(e -> deleteSelectedTasks(false));
 
         menu.add(miOpen);

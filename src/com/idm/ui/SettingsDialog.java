@@ -1,6 +1,7 @@
 package com.idm.ui;
 
 import com.idm.model.AppSettings;
+import com.idm.model.DownloadCategory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,6 +59,7 @@ public class SettingsDialog extends JDialog {
                 txtDownloadDir.setText(chooser.getSelectedFile().getAbsolutePath());
             }
         });
+        btnBrowse.setIcon(AppIcons.getOpenFolderIcon(14));
         dirPanel.add(btnBrowse, BorderLayout.EAST);
         generalPanel.add(dirPanel, gbc);
 
@@ -94,7 +96,7 @@ public class SettingsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
         generalPanel.add(chkDarkMode, gbc);
 
-        tabs.addTab("General & Downloads", generalPanel);
+        tabs.addTab("General & Downloads", AppIcons.getSettingsIcon(16), generalPanel);
 
         // Network tab
         JPanel netPanel = new JPanel(new GridBagLayout());
@@ -113,13 +115,13 @@ public class SettingsDialog extends JDialog {
         gbcNet.gridx = 0; gbcNet.gridy = 2;
         netPanel.add(lblAgentHint, gbcNet);
 
-        tabs.addTab("Network & Connection", netPanel);
+        tabs.addTab("Network & Connection", AppIcons.getCategoryIcon(DownloadCategory.DOWNLOADING, 16), netPanel);
 
         add(tabs, BorderLayout.CENTER);
 
         // Bottom buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
-        JButton btnSave = new JButton("Save & Apply");
+        JButton btnSave = new JButton("Save & Apply", AppIcons.getResumeIcon(14));
         JButton btnCancel = new JButton("Cancel");
 
         btnSave.addActionListener(e -> {

@@ -115,6 +115,10 @@ public class AddDownloadDialog extends JDialog {
         JButton btnCancel = new JButton("Cancel");
 
         btnDownloadNow.setFont(btnDownloadNow.getFont().deriveFont(Font.BOLD));
+        btnDownloadNow.setIcon(AppIcons.getResumeIcon(16));
+        btnDownloadLater.setIcon(AppIcons.getPauseIcon(16));
+        btnBrowse.setIcon(AppIcons.getOpenFolderIcon(14));
+        btnProbe.setIcon(AppIcons.getRestartIcon(14));
 
         buttonPanel.add(btnDownloadLater);
         buttonPanel.add(btnDownloadNow);

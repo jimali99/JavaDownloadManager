@@ -54,9 +54,9 @@ Traditional web browsers download files using a **single TCP connection**, which
 ## 🖥️ How to Run & Use
 
 ### Option 1: One-Click Run (Easiest)
-Simply double-click **`run.bat`** in this folder:
-```
-C:\Users\jim\.gemini\antigravity\scratch\JavaDownloadManager\run.bat
+Simply double-click **`run.bat`** in the project folder, or run:
+```cmd
+run.bat
 ```
 *(Uses `javaw.exe` so the application opens cleanly without an ugly command prompt console window).*
 
@@ -65,7 +65,7 @@ You can also directly double-click **`IDM-Java.jar`**.
 ### Option 2: Create Desktop Shortcut
 Right-click `create_desktop_shortcut.ps1` and select **"Run with PowerShell"**, or execute in PowerShell:
 ```powershell
-powershell -ExecutionPolicy Bypass -File "C:\Users\jim\.gemini\antigravity\scratch\JavaDownloadManager\create_desktop_shortcut.ps1"
+powershell -ExecutionPolicy Bypass -File .\create_desktop_shortcut.ps1
 ```
 A shortcut named **"Internet Download Manager (Java)"** will appear on your Windows Desktop.
 
@@ -103,9 +103,9 @@ A dedicated Chrome Extension (Manifest V3) is included in `chrome-extension/`. I
 1. Double-click `install_chrome_extension.bat` (or open `chrome://extensions` in Google Chrome).
 2. Toggle on **Developer mode** in the top-right corner of the Extensions page.
 3. Click the **"Load unpacked"** button in the top-left corner.
-4. Select the folder:
-   ```
-   C:\Users\jim\.gemini\antigravity\scratch\JavaDownloadManager\chrome-extension
+4. Select the `chrome-extension` folder inside this repository:
+   ```text
+   path\to\JavaDownloadManager\chrome-extension
    ```
 5. Done! The extension is active and will immediately route downloads to IDM whenever IDM is running.
 
