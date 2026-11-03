@@ -57,14 +57,24 @@ if "!YTDL_BIN!"=="" (
     )
 )
 
+:: Check for session cookies (exported from Chrome extension or saved)
+set "COOKIE_OPT="
+if exist "%TEMP%\jdm_yt_cookies.txt" (
+    echo [Auth] Found active YouTube session cookies. Authenticating...
+    set "COOKIE_OPT=--cookies "%TEMP%\jdm_yt_cookies.txt""
+) else if exist "%APPDATA%\JavaDownloadManager\youtube_cookies.txt" (
+    echo [Auth] Found saved YouTube session cookies. Authenticating...
+    set "COOKIE_OPT=--cookies "%APPDATA%\JavaDownloadManager\youtube_cookies.txt""
+)
+
 echo [1/2] Connecting to YouTube and analyzing streams...
 echo [2/2] Downloading Full HD video + audio and merging with FFmpeg...
 echo.
 
 if "!USE_PYTHON!"=="1" (
-    python -m yt_dlp --no-playlist --js-runtimes node -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b" --merge-output-format mp4 -P "%USERPROFILE%\Downloads" "!VIDEO_URL!"
+    python -m yt_dlp !COOKIE_OPT! --no-playlist --js-runtimes node -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b" --merge-output-format mp4 -P "%USERPROFILE%\Downloads" "!VIDEO_URL!"
 ) else (
-    "!YTDL_BIN!" --no-playlist --js-runtimes node -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b" --merge-output-format mp4 -P "%USERPROFILE%\Downloads" "!VIDEO_URL!"
+    "!YTDL_BIN!" !COOKIE_OPT! --no-playlist --js-runtimes node -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b" --merge-output-format mp4 -P "%USERPROFILE%\Downloads" "!VIDEO_URL!"
 )
 
 if %errorlevel% equ 0 (
@@ -81,7 +91,12 @@ if %errorlevel% equ 0 (
     echo.
     echo ========================================================
     echo  [!] Download encountered an error.
-    echo  See error messages above.
+    echo.
+    echo  If YouTube asks to "Sign in to confirm you're not a bot"
+    echo  or for age-restricted videos:
+    echo  1. Make sure you are logged into YouTube in Chrome.
+    echo  2. Click "Download YouTube Video" directly on the video
+    echo     in Chrome so JDM automatically uses your login session.
     echo ========================================================
     echo.
     pause

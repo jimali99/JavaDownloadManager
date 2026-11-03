@@ -190,11 +190,13 @@ public class LocalApiServer {
     private void handleAddDownload(String method, String body, String query, OutputStream out) throws IOException {
         String url = null;
         String fileName = null;
+        String cookiesData = null;
         boolean autoStart = false; // Safe default: prompt user dialog, never silently download
 
         if ("POST".equalsIgnoreCase(method)) {
             url = extractJsonField(body, "url");
             fileName = extractJsonField(body, "fileName");
+            cookiesData = extractJsonField(body, "cookies");
             String autoStr = extractJsonField(body, "autoStart");
             if (autoStr != null) {
                 autoStart = "true".equalsIgnoreCase(autoStr);
@@ -211,6 +213,22 @@ public class LocalApiServer {
         if (url == null || url.trim().isEmpty()) {
             sendResponse(out, 400, "Bad Request", "application/json", "{\"success\":false,\"error\":\"Missing URL parameter\"}");
             return;
+        }
+
+        // Save authenticated session cookies if passed from browser
+        if (cookiesData != null && !cookiesData.trim().isEmpty()) {
+            try {
+                File tempCookieFile = new File(System.getProperty("java.io.tmpdir"), "jdm_yt_cookies.txt");
+                java.nio.file.Files.writeString(tempCookieFile.toPath(), cookiesData.trim(), java.nio.charset.StandardCharsets.UTF_8);
+
+                String appData = System.getenv("APPDATA");
+                if (appData != null) {
+                    File jdmDir = new File(appData, "JavaDownloadManager");
+                    if (!jdmDir.exists()) jdmDir.mkdirs();
+                    File permCookieFile = new File(jdmDir, "youtube_cookies.txt");
+                    java.nio.file.Files.writeString(permCookieFile.toPath(), cookiesData.trim(), java.nio.charset.StandardCharsets.UTF_8);
+                }
+            } catch (Exception ignored) {}
         }
 
         final String downloadUrl = url.trim();

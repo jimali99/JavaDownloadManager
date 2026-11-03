@@ -270,6 +270,18 @@ public class AddDownloadDialog extends JDialog {
                 java.nio.file.Files.writeString(tempFile.toPath(), cleanUrl.trim(), java.nio.charset.StandardCharsets.UTF_8);
             }
 
+            // Ensure stored session cookies are copied to temp directory for yt-dlp
+            try {
+                String appData = System.getenv("APPDATA");
+                if (appData != null) {
+                    java.io.File permCookies = new java.io.File(appData, "JavaDownloadManager\\youtube_cookies.txt");
+                    java.io.File tempCookies = new java.io.File(System.getProperty("java.io.tmpdir"), "jdm_yt_cookies.txt");
+                    if (permCookies.exists() && (!tempCookies.exists() || tempCookies.length() == 0)) {
+                        java.nio.file.Files.copy(permCookies.toPath(), tempCookies.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+            } catch (Exception ignored) {}
+
             java.io.File bat = null;
 
             // 1. Current working directory

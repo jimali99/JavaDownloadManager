@@ -9,11 +9,14 @@
     "storage",
     "notifications",
     "activeTab",
-    "webRequest"
+    "webRequest",
+    "cookies"
   ],
   "host_permissions": [
     "http://127.0.0.1:9614/*",
     "http://localhost:9614/*",
+    "*://*.youtube.com/*",
+    "*://*.google.com/*",
     "<all_urls>"
   ],
   "background": {
