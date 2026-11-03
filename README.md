@@ -26,7 +26,7 @@ Traditional web browsers download files using a **single TCP connection**, which
 2. Server-side per-connection bandwidth throttling.
 3. Network congestion on individual streams.
 
-### IDM Dynamic File Segmentation:
+### JDM Dynamic File Segmentation:
 1. **Parallel Segment Acceleration (1 to 32 Connections):**
    - Probes the server with HTTP Range requests (`Accept-Ranges: bytes` & HTTP 206 Partial Content).
    - Divides the file into $N$ equal chunks (e.g. 8, 16, or 32 parallel connections).
@@ -42,14 +42,15 @@ Traditional web browsers download files using a **single TCP connection**, which
 
 ---
 
-## 🚀 Key Features Matching IDM
+## 🚀 Key Features Matching JDM
 
-- **IDM Visual Segment Acceleration Bar:**
+- **JDM Visual Segment Acceleration Bar:**
   - Iconic real-time visualization showing live progress and colors for every connection chunk.
   - Per-thread inspection table showing Thread #, Range, Downloaded Bytes, %, Speed, and Status.
 - **Modern Polished Interface:**
+  - Official custom JDM logo, window icons, and system tray branding.
   - Modern Windows 11 rounded dark theme powered by FlatLaf.
-  - Interactive table with embedded progress bars, transfer speed, and ETA countdown.
+  - Interactive table with embedded progress capsules, transfer speed, and ETA countdown.
   - Category sidebar: Compressed (.zip, .rar, .iso), Documents (.pdf, .doc), Videos (.mp4, .mkv), Music (.mp3), Programs (.exe, .msi), and Custom.
 - **Smart Queue & Scheduling:**
   - Limit max concurrent active downloads (e.g., 3 active) while others wait in queue.
@@ -62,7 +63,7 @@ Traditional web browsers download files using a **single TCP connection**, which
   - Minimizes cleanly to Windows System Tray.
 - **Customizable Speed Limiter & User-Agent:**
   - Set global speed cap (e.g. 500 KB/s or unlimited).
-  - Uses modern browser User-Agent so CDNs and cloudflare don't throttle or block automated requests.
+  - Uses modern browser User-Agent so CDNs and Cloudflare don't throttle or block automated requests.
 
 ---
 
@@ -82,7 +83,7 @@ Right-click `create_desktop_shortcut.ps1` and select **"Run with PowerShell"**, 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\create_desktop_shortcut.ps1
 ```
-A shortcut named **"Internet Download Manager (Java)"** will appear on your Windows Desktop.
+A shortcut named **"Java Download Manager (JDM Pro)"** will appear on your Windows Desktop.
 
 ### Option 3: Command Line (CLI) Download
 You can pass any URL directly to download it:
@@ -92,9 +93,9 @@ run.bat https://example.com/file.zip
 
 ---
 
-## 🌐 Chrome Extension (IDM Integration Module)
+## 🌐 Chrome Extension (JDM Integration Module)
 
-A dedicated Chrome Extension (Manifest V3) is included in `chrome-extension/`. It intercepts browser downloads and adds right-click context menus so you can download files with IDM anytime with a single click.
+A dedicated Chrome Extension (Manifest V3) is included in `chrome-extension/`. It intercepts browser downloads and adds right-click context menus so you can download files with JDM anytime with a single click.
 
 ### Features of the Extension:
 * **🎬 Automatic Video & Media Stream Sniffer:**
@@ -102,17 +103,17 @@ A dedicated Chrome Extension (Manifest V3) is included in `chrome-extension/`. I
   * Real-time network sniffer detects streaming media (`.mp4`, `.webm`, `.mkv`, `.m4v`, `.flv`, `.ts`, HLS `.m3u8` playlists).
   * Extension badge shows the count of detected videos on the active tab (e.g. `1`, `2`).
   * Popup includes a dedicated **"Videos on this Page"** card with one-click download buttons for each detected stream.
-* **Automatic Download Interception:** When you click any download link in Chrome, the extension automatically catches it, pauses Chrome's slow single-thread download, and redirects it to IDM for multi-thread acceleration.
+* **Automatic Download Interception:** When you click any download link in Chrome, the extension automatically catches it, pauses Chrome's slow single-thread download, and redirects it to JDM for multi-thread acceleration.
 * **Right-Click Context Menus:**
-  * Right-click any link ➔ **"Download with IDM"**
-  * Right-click any video, audio, or image ➔ **"Download video / media with IDM"**
-  * Right-click selected text with a URL ➔ **"Download selected link with IDM"**
+  * Right-click any link ➔ **"Download with JDM"**
+  * Right-click any video, audio, or image ➔ **"Download video / media with JDM"**
+  * Right-click selected text with a URL ➔ **"Download selected link with JDM"**
 * **Popup Control Center:**
-  * Live status indicator: 🟢 Connected to IDM / 🔴 IDM Offline
+  * Live status indicator: 🟢 Connected to JDM / 🔴 JDM Offline
   * Real-time active download counter and aggregate download speed
   * Quick URL download box (with clipboard paste support)
   * One-click toggle switch to enable/disable automatic interception
-  * "Open IDM Window" button
+  * "Open JDM Window" button
 
 ### 30-Second Installation in Chrome:
 1. Double-click `install_chrome_extension.bat` (or open `chrome://extensions` in Google Chrome).
@@ -120,9 +121,9 @@ A dedicated Chrome Extension (Manifest V3) is included in `chrome-extension/`. I
 3. Click the **"Load unpacked"** button in the top-left corner.
 4. Select the `chrome-extension` folder inside this repository:
    ```text
-   path\to\JavaDownloadManager\chrome-extension
+   JavaDownloadManager\chrome-extension
    ```
-5. Done! The extension is active and will immediately route downloads to IDM whenever IDM is running.
+5. Done! The extension is active and will immediately route downloads to JDM whenever JDM is running.
 
 ---
 
@@ -140,39 +141,32 @@ It will recompile with `javac` and generate an updated self-contained `IDM-Java.
 
 ```
 JavaDownloadManager/
-├── IDM-Java.jar                 # Standalone executable FAT-JAR (bundled with FlatLaf)
+├── IDM-Java.jar                 # Standalone executable FAT-JAR (bundled with FlatLaf & icons)
+├── assets/                      # High-res logos and banners for repository
+│   ├── logo-banner.png          # Hero presentation banner (1024x558)
+│   └── logo-square.png          # Square focused brand emblem
+├── resources/                   # Application icons (16px to 256px)
+├── chrome-extension/            # Chrome Extension (Manifest V3)
+│   ├── manifest.json
+│   ├── background.js            # Download interceptor & media sniffer
+│   ├── content.js               # Floating video download button
+│   ├── popup.html               # Extension UI & video downloader
+│   └── icons/                   # Chrome extension icons
 ├── run.bat                      # Silent launcher script
 ├── build.bat                    # One-click compiler & packager
+├── push_to_github.bat           # 1-Click sync to GitHub repository
 ├── create_desktop_shortcut.ps1  # Windows desktop shortcut creator
 ├── flatlaf-3.5.4.jar            # Modern UI theme library
-├── bin/                         # Compiled bytecodes
 └── src/
     └── com/idm/
         ├── Main.java                        # High-DPI entry point
-        ├── model/
-        │   ├── DownloadTask.java            # Task state, listeners, file metadata
-        │   ├── DownloadSegment.java         # Connection chunk boundaries & status
-        │   ├── DownloadStatus.java          # State enum (Downloading, Paused, Completed)
-        │   ├── DownloadCategory.java        # Extension-based category organizer
-        │   └── AppSettings.java             # User preferences & persistence
-        ├── engine/
-        │   ├── DownloadEngine.java          # Multi-thread coordinator
-        │   ├── SegmentWorker.java           # FileChannel concurrent stream worker
-        │   ├── DownloadQueueManager.java    # Queue concurrency scheduler
-        │   ├── SpeedCalculator.java         # Rolling EMA speed & ETA calculation
-        │   └── UrlProber.java               # HTTP redirect & Accept-Ranges probing
-        ├── ui/
-        │   ├── MainFrame.java               # Main IDM window with toolbar & categories
+        ├── model/                           # Task models and state management
+        ├── engine/                          # Multi-thread FileChannel accelerated engine
+        ├── ui/                              # Modern FlatLaf dark interface and icons
+        │   ├── AppIcons.java                # Vector and resource icon loader
+        │   ├── MainFrame.java               # Main JDM window with toolbar & categories
         │   ├── DownloadDetailDialog.java    # Real-time inspection window
         │   ├── SegmentVisualizerPanel.java  # Visual connection chunk bar
-        │   ├── AddDownloadDialog.java       # Add URL dialog with server probe
-        │   ├── SettingsDialog.java          # Preferences dialog
-        │   ├── DownloadTableModel.java      # JTable model
-        │   ├── ProgressCellRenderer.java    # Table cell progress bar renderer
-        │   └── ThemeManager.java            # FlatLaf dark theme styling
-        └── util/
-            ├── FormatUtils.java             # Byte/speed/time formatting
-            ├── SoundUtils.java              # Pure Java audio chime generator
-            ├── StorageUtils.java            # Task history and resume metadata I/O
-            └── ClipboardMonitor.java        # Clipboard link listener
+        │   └── SettingsDialog.java          # Preferences dialog
+        └── util/                            # Sound, clipboard, and format helpers
 ```
