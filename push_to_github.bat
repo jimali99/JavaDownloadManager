@@ -53,9 +53,13 @@ git add .
 echo.
 echo [2/3] Checking commits...
 git status -s > nul 2>&1
-git commit -m "Update IDM UI with modern vector icons and styling" 2>nul || (
+git commit -m "Update JDM software, icons, and documentation" 2>nul || (
     echo [Info] Local files already committed.
 )
+
+echo.
+echo [2.5/3] Synchronizing with GitHub...
+git pull --no-rebase origin main --no-edit >nul 2>&1
 
 echo.
 echo [3/3] Uploading (pushing) to GitHub...
