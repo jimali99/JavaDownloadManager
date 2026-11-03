@@ -208,7 +208,8 @@
                 setTimeout(() => { label.textContent = old; }, 3500);
             } else {
                 label.textContent = "JDM Offline";
-                alert("Java Download Manager is not currently running!\n\nPlease open Java Download Manager on your PC (run.bat or IDM-Java.jar), then click Download again.");
+                const errorMsg = res && res.error ? res.error : "Java Download Manager is not currently running!\n\nPlease open Java Download Manager on your PC (run.bat or IDM-Java.jar), then click Download again.";
+                alert(errorMsg);
                 setTimeout(() => { label.textContent = "Download this video"; }, 2500);
             }
         });

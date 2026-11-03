@@ -92,11 +92,32 @@ public class LocalApiServer {
              InputStream in = socket.getInputStream();
              OutputStream out = socket.getOutputStream()) {
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            String requestLine = reader.readLine();
-            if (requestLine == null || requestLine.isEmpty()) return;
+            // Read raw bytes until end of HTTP headers (\r\n\r\n)
+            ByteArrayOutputStream headerBuffer = new ByteArrayOutputStream();
+            int b;
+            int matched = 0;
+            byte[] separator = new byte[]{'\r', '\n', '\r', '\n'};
 
-            String[] parts = requestLine.split(" ");
+            while ((b = in.read()) != -1) {
+                headerBuffer.write(b);
+                if (b == separator[matched]) {
+                    matched++;
+                    if (matched == 4) break;
+                } else if (b == '\r') {
+                    matched = 1;
+                } else {
+                    matched = 0;
+                }
+            }
+
+            if (matched < 4) return; // Incomplete HTTP header stream
+
+            byte[] headerBytes = headerBuffer.toByteArray();
+            String headerText = new String(headerBytes, 0, headerBytes.length - 4, StandardCharsets.UTF_8);
+            String[] lines = headerText.split("\r\n");
+            if (lines.length == 0 || lines[0].isEmpty()) return;
+
+            String[] parts = lines[0].split(" ");
             if (parts.length < 2) return;
 
             String method = parts[0].toUpperCase();
@@ -104,9 +125,9 @@ public class LocalApiServer {
 
             // Read HTTP headers
             Map<String, String> headers = new HashMap<>();
-            String line;
             int contentLength = 0;
-            while ((line = reader.readLine()) != null && !line.isEmpty()) {
+            for (int i = 1; i < lines.length; i++) {
+                String line = lines[i];
                 int colon = line.indexOf(':');
                 if (colon > 0) {
                     String hKey = line.substring(0, colon).trim().toLowerCase();
@@ -120,17 +141,11 @@ public class LocalApiServer {
                 }
             }
 
-            // Read body if POST
+            // Read exact body byte count if POST, avoiding UTF-8 character deadlock
             String body = "";
             if (contentLength > 0) {
-                char[] bodyBuf = new char[contentLength];
-                int totalRead = 0;
-                while (totalRead < contentLength) {
-                    int r = reader.read(bodyBuf, totalRead, contentLength - totalRead);
-                    if (r == -1) break;
-                    totalRead += r;
-                }
-                body = new String(bodyBuf, 0, totalRead);
+                byte[] bodyBytes = in.readNBytes(contentLength);
+                body = new String(bodyBytes, StandardCharsets.UTF_8);
             }
 
             // Separate path and query
@@ -155,7 +170,9 @@ public class LocalApiServer {
                 sendResponse(out, 404, "Not Found", "application/json", "{\"error\":\"Not Found\"}");
             }
 
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            System.err.println("[LocalApiServer] Request processing error: " + e.getMessage());
+        }
     }
 
     private void handleStatus(OutputStream out) throws IOException {

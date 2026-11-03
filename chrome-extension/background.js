@@ -276,8 +276,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "DOWNLOAD_MEDIA_ITEM") {
         chrome.storage.local.get({ autoStart: false }, (settings) => {
             sendDownloadToIdm(message.url, message.filename || "", settings.autoStart)
-                .then(success => sendResponse({ success }))
-                .catch(() => sendResponse({ success: false }));
+                .then(result => sendResponse(result))
+                .catch(err => sendResponse({ success: false, error: err ? err.message : "Request failed" }));
         });
         return true;
     }
@@ -348,15 +348,18 @@ async function sendDownloadToIdm(url, filename = "", autoStart = false) {
 
         if (response.ok) {
             updateExtensionBadge(true);
-            return true;
+            return { success: true };
         } else {
-            notifyUser("JDM Error", "JDM rejected the download request.");
-            return false;
+            const data = await response.json().catch(() => ({}));
+            const msg = data.error || "JDM rejected the download request.";
+            notifyUser("JDM Error", msg);
+            return { success: false, error: msg };
         }
     } catch (err) {
+        console.warn("sendDownloadToIdm failed:", err);
         notifyUser("JDM Not Running", "Please start Java Download Manager on your PC first.");
         updateExtensionBadge(false);
-        return false;
+        return { success: false, error: "Java Download Manager is not currently running!\n\nPlease open Java Download Manager on your PC (run.bat or IDM-Java.jar), then click Download again." };
     }
 }
 
