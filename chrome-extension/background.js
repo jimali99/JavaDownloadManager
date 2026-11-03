@@ -11,19 +11,18 @@ const MEDIA_MIMES = [
     "audio/mpeg", "audio/mp4", "audio/ogg", "audio/aac", "audio/wav"
 ];
 
+// Ensure safe defaults on launch: auto-interception is disabled unless user explicitly toggles it
+chrome.storage.local.set({
+    interceptDownloads: false,
+    autoStart: false
+});
+
 // Initialize on installation
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.storage.local.get({
+    chrome.storage.local.set({
         interceptDownloads: false,
         autoStart: false,
         detectVideos: true
-    }, (settings) => {
-        // Enforce safe defaults: do not automatically intercept browser downloads without user consent
-        chrome.storage.local.set({
-            interceptDownloads: false,
-            autoStart: false,
-            detectVideos: true
-        });
     });
 
     createContextMenus();
@@ -79,7 +78,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 
     if (targetUrl) {
-        chrome.storage.local.get({ autoStart: true }, (settings) => {
+        chrome.storage.local.get({ autoStart: false }, (settings) => {
             sendDownloadToIdm(targetUrl, "", settings.autoStart);
         });
     }
@@ -93,14 +92,14 @@ chrome.downloads.onCreated.addListener(async (downloadItem) => {
     }
 
     // CRITICAL: Strictly ignore completed, interrupted, or past downloads from history
-    if (downloadItem.state && downloadItem.state !== "in_progress") {
+    if (!downloadItem || downloadItem.state !== "in_progress") {
         return;
     }
 
-    // Ignore downloads that were created more than 4 seconds ago (restored from browser history)
+    // Ignore downloads that were created more than 2 seconds ago (restored from browser history)
     if (downloadItem.startTime) {
         const elapsed = Date.now() - new Date(downloadItem.startTime).getTime();
-        if (elapsed > 4000) {
+        if (elapsed > 2000 || elapsed < 0) {
             return;
         }
     }
@@ -269,7 +268,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.type === "DOWNLOAD_MEDIA_ITEM") {
-        chrome.storage.local.get({ autoStart: true }, (settings) => {
+        chrome.storage.local.get({ autoStart: false }, (settings) => {
             sendDownloadToIdm(message.url, message.filename || "", settings.autoStart)
                 .then(success => sendResponse({ success }))
                 .catch(() => sendResponse({ success: false }));
@@ -279,7 +278,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // Send Download to IDM API
-async function sendDownloadToIdm(url, filename = "", autoStart = true) {
+async function sendDownloadToIdm(url, filename = "", autoStart = false) {
     try {
         const response = await fetch(`${IDM_API_URL}/add-download`, {
             method: "POST",

@@ -190,21 +190,21 @@ public class LocalApiServer {
     private void handleAddDownload(String method, String body, String query, OutputStream out) throws IOException {
         String url = null;
         String fileName = null;
-        boolean autoStart = true;
+        boolean autoStart = false; // Safe default: prompt user dialog, never silently download
 
         if ("POST".equalsIgnoreCase(method)) {
             url = extractJsonField(body, "url");
             fileName = extractJsonField(body, "fileName");
             String autoStr = extractJsonField(body, "autoStart");
             if (autoStr != null) {
-                autoStart = !"false".equalsIgnoreCase(autoStr);
+                autoStart = "true".equalsIgnoreCase(autoStr);
             }
         } else if ("GET".equalsIgnoreCase(method) && query != null && !query.isEmpty()) {
             Map<String, String> params = parseQueryParams(query);
             url = params.get("url");
             fileName = params.get("fileName");
             if (params.containsKey("autoStart")) {
-                autoStart = !"false".equalsIgnoreCase(params.get("autoStart"));
+                autoStart = "true".equalsIgnoreCase(params.get("autoStart"));
             }
         }
 

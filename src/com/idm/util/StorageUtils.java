@@ -44,9 +44,9 @@ public class StorageUtils {
         if (file.exists()) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 List<DownloadTask> loaded = (List<DownloadTask>) ois.readObject();
-                // Fix up statuses for interrupted tasks
+                // Fix up statuses for interrupted tasks: never auto-start on launch
                 for (DownloadTask t : loaded) {
-                    if (t.getStatus().isActive()) {
+                    if (t.getStatus().isActive() || t.getStatus() == DownloadStatus.QUEUED) {
                         t.setStatus(DownloadStatus.PAUSED);
                     }
                 }

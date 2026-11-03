@@ -145,10 +145,34 @@ public class DownloadQueueManager {
 
     public synchronized void pauseAll() {
         for (DownloadTask task : tasks) {
+            DownloadEngine engine = engines.remove(task.getId());
+            if (engine != null) {
+                engine.pause();
+            }
             if (task.getStatus().isActive() || task.getStatus() == DownloadStatus.QUEUED) {
-                pauseTask(task);
+                task.setStatus(DownloadStatus.PAUSED);
             }
         }
+        saveTasks();
+        notifyQueueChanged();
+    }
+
+    public synchronized void removeAllTasks(boolean deleteLocalFiles) {
+        pauseAll();
+        for (DownloadTask task : tasks) {
+            StorageUtils.deleteTaskFiles(task);
+            if (deleteLocalFiles) {
+                try {
+                    File out = task.getOutputFile();
+                    if (out != null && out.exists()) {
+                        out.delete();
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+        tasks.clear();
+        saveTasks();
+        notifyQueueChanged();
     }
 
     public synchronized void resumeAll() {

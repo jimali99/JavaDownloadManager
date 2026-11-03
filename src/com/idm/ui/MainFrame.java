@@ -253,12 +253,16 @@ public class MainFrame extends JFrame {
         miDelete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         miDelete.addActionListener(e -> promptDeleteSelected());
 
+        JMenuItem miClearAll = new JMenuItem("Clear All Downloads...", AppIcons.getDeleteIcon(16));
+        miClearAll.addActionListener(e -> promptClearAllDownloads());
+
         mTasks.add(miAdd);
         mTasks.add(miYouTube);
         mTasks.addSeparator();
         mTasks.add(miResume);
         mTasks.add(miPause);
         mTasks.add(miDelete);
+        mTasks.add(miClearAll);
         mTasks.addSeparator();
         mTasks.add(miResumeAll);
         mTasks.add(miPauseAll);
@@ -801,6 +805,38 @@ public class MainFrame extends JFrame {
                 "File Deletion Notice",
                 JOptionPane.WARNING_MESSAGE
             );
+        }
+    }
+
+    private void promptClearAllDownloads() {
+        int count = queueManager.getTasks().size();
+        if (count == 0) {
+            JOptionPane.showMessageDialog(this, "The download list is already empty.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        Object[] options = {"Remove from list only", "Delete files from disk too", "Cancel"};
+        int choice = JOptionPane.showOptionDialog(
+            this,
+            "Are you sure you want to clear all " + count + " downloads from JDM?",
+            "Clear All Downloads",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE,
+            null,
+            options,
+            options[0]
+        );
+
+        if (choice == 0) {
+            queueManager.removeAllTasks(false);
+            tableModel.refreshFilteredList();
+            tableModel.fireTableDataChanged();
+            downloadTable.clearSelection();
+        } else if (choice == 1) {
+            queueManager.removeAllTasks(true);
+            tableModel.refreshFilteredList();
+            tableModel.fireTableDataChanged();
+            downloadTable.clearSelection();
         }
     }
 
