@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDM Integration</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-title">
+                <div class="logo-icon">⚡</div>
+                <div>
+                    <h1 class="title">IDM Integration</h1>
+                    <span class="subtitle">Multi-Thread Accelerator</span>
+                </div>
+            </div>
+            <div id="statusBadge" class="badge checking">
+                <span class="dot"></span>
+                <span id="statusText">Checking...</span>
+            </div>
+        </header>
+
+        <!-- Stats Card -->
+        <div class="stats-card">
+            <div class="stat-item">
+                <span class="stat-label">Active Downloads</span>
+                <span id="activeCount" class="stat-value">0</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-label">Total Speed</span>
+                <span id="totalSpeed" class="stat-value">0 KB/s</span>
+            </div>
+        </div>
+
+        <!-- Detected Videos on Page (IDM Video Sniffer) -->
+        <div class="section video-section">
+            <div class="section-header">
+                <span class="section-label">🎬 Videos on this Page (<span id="videoCount">0</span>)</span>
+            </div>
+            <div id="videoList" class="video-list">
+                <div class="no-videos">No media detected yet. Play video to capture.</div>
+            </div>
+        </div>
+
+        <!-- Quick Download Section -->
+        <div class="section">
+            <label for="urlInput" class="section-label">Quick Download URL:</label>
+            <div class="input-group">
+                <input type="text" id="urlInput" placeholder="Paste link (https://...)" spellcheck="false" autocomplete="off">
+                <button id="btnPaste" class="btn-icon" title="Paste from clipboard">📋</button>
+            </div>
+            <button id="btnDownload" class="btn-primary">
+                <span>⬇ Download with IDM</span>
+            </button>
+        </div>
+
+        <!-- Toggles Section -->
+        <div class="section toggles-section">
+            <div class="toggle-row">
+                <div class="toggle-info">
+                    <span class="toggle-title">Intercept Chrome Downloads</span>
+                    <span class="toggle-desc">Automatically send browser downloads to IDM</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="chkIntercept" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <div class="toggle-info">
+                    <span class="toggle-title">Auto-Start Download</span>
+                    <span class="toggle-desc">Start immediately without prompt</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="chkAutoStart" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <footer class="footer">
+            <button id="btnOpenIdm" class="btn-secondary">
+                <span>🖥 Open IDM Window</span>
+            </button>
+            <button id="btnRefresh" class="btn-secondary btn-refresh" title="Refresh connection">
+                <span>🔄</span>
+            </button>
+        </footer>
+
+        <div id="toastMessage" class="toast hidden"></div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

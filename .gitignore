@@ -1,0 +1,28 @@
+# Byte-compiled / Object files
+bin/
+*.class
+
+# Temporary download files and metadata
+*.idm_temp
+*.idm_meta
+*.tmp
+*.log
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# IDE / Editor files
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Build artifacts (optional, keep source code clean)
+# Releases should ideally be uploaded to GitHub Releases
+sources.txt
