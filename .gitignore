@@ -26,3 +26,6 @@ $RECYCLE.BIN/
 # Build artifacts (optional, keep source code clean)
 # Releases should ideally be uploaded to GitHub Releases
 sources.txt
+
+# Local sync scripts
+push_to_github.bat

@@ -154,7 +154,6 @@ JavaDownloadManager/
 │   └── icons/                   # Chrome extension icons
 ├── run.bat                      # Silent launcher script
 ├── build.bat                    # One-click compiler & packager
-├── push_to_github.bat           # 1-Click sync to GitHub repository
 ├── create_desktop_shortcut.ps1  # Windows desktop shortcut creator
 ├── flatlaf-3.5.4.jar            # Modern UI theme library
 └── src/
