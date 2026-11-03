@@ -267,11 +267,32 @@ public class AddDownloadDialog extends JDialog {
             if (!bat.exists()) {
                 bat = new java.io.File(System.getProperty("user.dir"), "download_youtube.bat");
             }
-            String cmd = "cmd /c start \"JDM YouTube Downloader\" \"" + bat.getAbsolutePath() + "\"";
-            if (url != null && !url.trim().isEmpty()) {
-                cmd += " \"" + url.trim() + "\"";
+            if (!bat.exists()) {
+                try {
+                    String jarPath = AddDownloadDialog.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+                    if (jarPath != null) {
+                        java.io.File jarDir = new java.io.File(jarPath).getParentFile();
+                        java.io.File candidate = new java.io.File(jarDir, "download_youtube.bat");
+                        if (candidate.exists()) bat = candidate;
+                    }
+                } catch (Exception ignored) {}
             }
-            Runtime.getRuntime().exec(cmd);
+
+            java.util.List<String> command = new java.util.ArrayList<>();
+            command.add("cmd.exe");
+            command.add("/c");
+            command.add("start");
+            command.add("JDM YouTube Downloader");
+            command.add(bat.getAbsolutePath());
+            if (url != null && !url.trim().isEmpty()) {
+                command.add(url.trim());
+            }
+
+            ProcessBuilder pb = new ProcessBuilder(command);
+            if (bat.getParentFile() != null) {
+                pb.directory(bat.getParentFile());
+            }
+            pb.start();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Could not launch YouTube downloader: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }

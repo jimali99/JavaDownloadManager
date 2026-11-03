@@ -45,11 +45,15 @@ if exist "resources" (
 )
 
 echo [3/3] Packaging standalone IDM-Java.jar...
-"%JAR_CMD%" cfe "IDM-Java.jar" com.idm.Main -C bin .
+"%JAR_CMD%" cfe "IDM-Java-new.jar" com.idm.Main -C bin .
 if %errorlevel% neq 0 (
     echo [ERROR] JAR packaging failed!
     if "%1"=="" pause
     exit /b 1
+)
+move /y "IDM-Java-new.jar" "IDM-Java.jar" >nul 2>&1
+if not exist "IDM-Java.jar" (
+    copy /y "IDM-Java-new.jar" "IDM-Java.jar" >nul 2>&1
 )
 
 echo.
