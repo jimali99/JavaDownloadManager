@@ -86,6 +86,9 @@ public class SegmentWorker implements Runnable {
             if (code != HttpURLConnection.HTTP_OK && code != HttpURLConnection.HTTP_PARTIAL) {
                 throw new RuntimeException("Server returned HTTP " + code + " for segment " + segment.getId());
             }
+            if (code == HttpURLConnection.HTTP_OK && current > 0) {
+                throw new RuntimeException("Server ignored Range request for segment " + segment.getId() + " and returned full file (HTTP 200).");
+            }
 
             in = connection.getInputStream();
             segment.setStatus("Downloading");

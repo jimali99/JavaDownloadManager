@@ -159,6 +159,37 @@ public class UrlProber {
         throw new IOException("Too many redirects: " + targetUrl);
     }
 
+    public static String extractFileNameFromUrl(String urlStr) {
+        if (urlStr == null || urlStr.trim().isEmpty()) {
+            return "download_" + System.currentTimeMillis();
+        }
+        String cleanUrl = urlStr.trim();
+        // Remove query parameters and fragment
+        int qIdx = cleanUrl.indexOf('?');
+        if (qIdx != -1) {
+            cleanUrl = cleanUrl.substring(0, qIdx);
+        }
+        int hashIdx = cleanUrl.indexOf('#');
+        if (hashIdx != -1) {
+            cleanUrl = cleanUrl.substring(0, hashIdx);
+        }
+
+        String fileName = null;
+        int lastSlash = Math.max(cleanUrl.lastIndexOf('/'), cleanUrl.lastIndexOf('\\'));
+        if (lastSlash != -1 && lastSlash < cleanUrl.length() - 1) {
+            try {
+                fileName = URLDecoder.decode(cleanUrl.substring(lastSlash + 1), StandardCharsets.UTF_8.name());
+            } catch (Exception ignored) {
+                fileName = cleanUrl.substring(lastSlash + 1);
+            }
+        }
+
+        if (fileName != null && !fileName.trim().isEmpty() && !fileName.trim().equals("/")) {
+            return FormatUtils.sanitizeFileName(fileName.trim());
+        }
+        return "download_" + System.currentTimeMillis();
+    }
+
     private static String extractFileName(String urlStr, String contentDisposition, String contentType) {
         String fileName = null;
 
@@ -184,16 +215,10 @@ public class UrlProber {
 
         // 2. Try extracting from URL path
         if (fileName == null || fileName.isEmpty()) {
-            try {
-                URI uri = new URI(urlStr);
-                String path = uri.getPath();
-                if (path != null && !path.isEmpty()) {
-                    int lastSlash = path.lastIndexOf('/');
-                    if (lastSlash != -1 && lastSlash < path.length() - 1) {
-                        fileName = URLDecoder.decode(path.substring(lastSlash + 1), StandardCharsets.UTF_8.name());
-                    }
-                }
-            } catch (Exception ignored) {}
+            String fromUrl = extractFileNameFromUrl(urlStr);
+            if (!fromUrl.startsWith("download_")) {
+                fileName = fromUrl;
+            }
         }
 
         // 3. Fallback to default name if still empty
@@ -201,9 +226,9 @@ public class UrlProber {
             fileName = "download_" + System.currentTimeMillis();
         }
 
-        // If filename does not have an extension, try guessing from contentType
+        // If filename does not have an extension, try guessing from contentType or URL
         if (!fileName.contains(".") && contentType != null) {
-            String ext = guessExtension(contentType);
+            String ext = guessExtension(contentType, urlStr);
             if (ext != null) {
                 fileName += ext;
             }
@@ -212,25 +237,78 @@ public class UrlProber {
         return FormatUtils.sanitizeFileName(fileName);
     }
 
-    private static String guessExtension(String contentType) {
+    public static String guessExtension(String contentType, String fallbackUrl) {
+        if (contentType == null) return null;
         String cleanType = contentType.split(";")[0].trim().toLowerCase();
         switch (cleanType) {
-            case "application/zip": return ".zip";
-            case "application/x-rar-compressed": return ".rar";
-            case "application/x-7z-compressed": return ".7z";
-            case "application/pdf": return ".pdf";
-            case "application/msword": return ".doc";
-            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document": return ".docx";
-            case "application/octet-stream": return ".bin";
-            case "video/mp4": return ".mp4";
-            case "video/x-matroska": return ".mkv";
-            case "audio/mpeg": return ".mp3";
-            case "image/jpeg": return ".jpg";
-            case "image/png": return ".png";
-            case "image/gif": return ".gif";
-            case "text/html": return ".html";
-            case "text/plain": return ".txt";
-            default: return null;
+            case "application/x-msdownload":
+            case "application/x-msdos-program":
+            case "application/x-exe":
+            case "application/exe":
+            case "application/vnd.microsoft.portable-executable":
+                return ".exe";
+            case "application/x-msi":
+                return ".msi";
+            case "application/java-archive":
+                return ".jar";
+            case "application/zip":
+            case "application/x-zip-compressed":
+                return ".zip";
+            case "application/x-rar-compressed":
+            case "application/vnd.rar":
+                return ".rar";
+            case "application/x-7z-compressed":
+                return ".7z";
+            case "application/pdf":
+                return ".pdf";
+            case "application/msword":
+                return ".doc";
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                return ".docx";
+            case "application/x-iso9660-image":
+                return ".iso";
+            case "application/vnd.android.package-archive":
+                return ".apk";
+            case "application/gzip":
+            case "application/x-gzip":
+                return ".gz";
+            case "application/x-tar":
+            case "application/tar":
+                return ".tar";
+            case "video/mp4":
+                return ".mp4";
+            case "video/x-matroska":
+                return ".mkv";
+            case "video/webm":
+                return ".webm";
+            case "audio/mpeg":
+                return ".mp3";
+            case "audio/wav":
+            case "audio/x-wav":
+                return ".wav";
+            case "image/jpeg":
+                return ".jpg";
+            case "image/png":
+                return ".png";
+            case "image/gif":
+                return ".gif";
+            case "text/html":
+                return ".html";
+            case "text/plain":
+                return ".txt";
+            case "application/octet-stream":
+                if (fallbackUrl != null) {
+                    String lowerUrl = fallbackUrl.toLowerCase();
+                    if (lowerUrl.contains(".exe")) return ".exe";
+                    if (lowerUrl.contains(".msi")) return ".msi";
+                    if (lowerUrl.contains(".zip")) return ".zip";
+                    if (lowerUrl.contains(".jar")) return ".jar";
+                    if (lowerUrl.contains(".iso")) return ".iso";
+                    if (lowerUrl.contains(".dmg")) return ".dmg";
+                }
+                return ".bin";
+            default:
+                return null;
         }
     }
 }

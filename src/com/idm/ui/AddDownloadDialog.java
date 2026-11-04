@@ -32,6 +32,10 @@ public class AddDownloadDialog extends JDialog {
     private volatile boolean probing = false;
 
     public AddDownloadDialog(Window owner, String initialUrl, DownloadQueueManager queueManager, AppSettings settings) {
+        this(owner, initialUrl, null, queueManager, settings);
+    }
+
+    public AddDownloadDialog(Window owner, String initialUrl, String suggestedFileName, DownloadQueueManager queueManager, AppSettings settings) {
         super(owner, "Enter New Address to Download", ModalityType.APPLICATION_MODAL);
         this.queueManager = queueManager;
         this.settings = settings;
@@ -44,7 +48,19 @@ public class AddDownloadDialog extends JDialog {
         initUI();
 
         if (initialUrl != null && !initialUrl.trim().isEmpty()) {
-            txtUrl.setText(initialUrl.trim());
+            String cleanUrl = initialUrl.trim();
+            txtUrl.setText(cleanUrl);
+
+            // Pre-fill filename immediately and synchronously before probe starts
+            if (suggestedFileName != null && !suggestedFileName.trim().isEmpty()) {
+                txtFileName.setText(FormatUtils.sanitizeFileName(suggestedFileName.trim()));
+            } else {
+                String extracted = UrlProber.extractFileNameFromUrl(cleanUrl);
+                if (extracted != null && !extracted.startsWith("download_")) {
+                    txtFileName.setText(extracted);
+                }
+            }
+
             triggerProbe();
         }
 
@@ -192,8 +208,9 @@ public class AddDownloadDialog extends JDialog {
                 SwingUtilities.invokeLater(() -> {
                     lblFileSize.setText("Unknown size");
                     lblResumeSupport.setText("Unknown");
-                    if (txtFileName.getText().trim().isEmpty()) {
-                        txtFileName.setText("download_" + System.currentTimeMillis());
+                    if (txtFileName.getText().trim().isEmpty() || txtFileName.getText().startsWith("download_")) {
+                        String fromUrl = UrlProber.extractFileNameFromUrl(url);
+                        txtFileName.setText(fromUrl);
                     }
                 });
             } finally {
@@ -235,8 +252,13 @@ public class AddDownloadDialog extends JDialog {
         }
 
         String fileName = txtFileName.getText().trim();
-        if (fileName.isEmpty()) {
-            fileName = "download_" + System.currentTimeMillis();
+        if (fileName.isEmpty() || fileName.startsWith("download_")) {
+            String fromUrl = UrlProber.extractFileNameFromUrl(url);
+            if (!fromUrl.startsWith("download_")) {
+                fileName = fromUrl;
+            } else if (fileName.isEmpty()) {
+                fileName = fromUrl;
+            }
         }
         fileName = FormatUtils.sanitizeFileName(fileName);
 

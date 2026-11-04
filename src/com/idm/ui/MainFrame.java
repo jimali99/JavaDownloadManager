@@ -7,6 +7,7 @@ import com.idm.model.DownloadStatus;
 import com.idm.model.DownloadTask;
 import com.idm.util.ClipboardMonitor;
 import com.idm.util.FormatUtils;
+import com.idm.util.StorageUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -847,30 +848,14 @@ public class MainFrame extends JFrame {
     private void openSelectedFile() {
         DownloadTask task = getSelectedTask();
         if (task != null) {
-            File f = task.getOutputFile();
-            if (f.exists()) {
-                try {
-                    Desktop.getDesktop().open(f);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Could not open file: " + ex.getMessage());
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "File does not exist or has not finished downloading.");
-            }
+            StorageUtils.openFileOrExecute(this, task.getOutputFile());
         }
     }
 
     private void openSelectedFolder() {
         DownloadTask task = getSelectedTask();
         if (task != null) {
-            File dir = new File(task.getSaveDirectory());
-            if (dir.exists()) {
-                try {
-                    Desktop.getDesktop().open(dir);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Could not open directory: " + ex.getMessage());
-                }
-            }
+            StorageUtils.openFolder(this, new File(task.getSaveDirectory()), task.getOutputFile());
         }
     }
 

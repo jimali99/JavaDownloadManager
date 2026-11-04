@@ -54,6 +54,15 @@ public class DownloadEngine {
     }
 
     private void initAndRun() throws Exception {
+        // Auto-fix generic or extension-less filenames from URL path
+        String currentName = task.getFileName();
+        if (currentName == null || currentName.isEmpty() || currentName.startsWith("download_") || !currentName.contains(".")) {
+            String fromUrl = UrlProber.extractFileNameFromUrl(task.getUrl());
+            if (!fromUrl.startsWith("download_")) {
+                task.setFileName(fromUrl);
+            }
+        }
+
         // Step 1: Probe URL if totalBytes not known or metadata not present
         boolean loadedMeta = StorageUtils.loadTaskMetadata(task);
 
@@ -64,6 +73,13 @@ public class DownloadEngine {
                 task.setTotalBytes(probe.getContentLength());
             }
             task.setResumeSupported(probe.isResumeSupported());
+
+            if (probe.getFileName() != null && !probe.getFileName().isEmpty() && !probe.getFileName().startsWith("download_")) {
+                String name = task.getFileName();
+                if (name == null || name.isEmpty() || name.startsWith("download_") || !name.contains(".")) {
+                    task.setFileName(probe.getFileName());
+                }
+            }
         }
 
         // Prepare destination files
@@ -178,6 +194,30 @@ public class DownloadEngine {
     private void finalizeDownload() {
         cleanup();
         File tempFile = task.getTempFile();
+
+        // Check if filename lacks extension or is generic: inspect magic bytes of completed file
+        String currentName = task.getFileName();
+        if (currentName == null || !currentName.contains(".") || currentName.startsWith("download_")) {
+            String detectedExt = detectExtensionFromMagicBytes(tempFile);
+            if (detectedExt != null) {
+                if (!currentName.contains(".")) {
+                    task.setFileName(currentName + detectedExt);
+                } else if (currentName.startsWith("download_")) {
+                    String fromUrl = UrlProber.extractFileNameFromUrl(task.getUrl());
+                    if (!fromUrl.startsWith("download_")) {
+                        task.setFileName(fromUrl);
+                    } else {
+                        task.setFileName(currentName + detectedExt);
+                    }
+                }
+            } else if (currentName.startsWith("download_")) {
+                String fromUrl = UrlProber.extractFileNameFromUrl(task.getUrl());
+                if (!fromUrl.startsWith("download_")) {
+                    task.setFileName(fromUrl);
+                }
+            }
+        }
+
         File outputFile = task.getOutputFile();
 
         // If output file already exists, create unique name
@@ -221,6 +261,57 @@ public class DownloadEngine {
             task.setErrorMessage("Failed to rename temporary download file to final output.");
             task.setStatus(DownloadStatus.ERROR);
         }
+    }
+
+    private String detectExtensionFromMagicBytes(File file) {
+        if (file == null || !file.exists() || file.length() < 4) return null;
+        try (java.io.InputStream is = new java.io.FileInputStream(file)) {
+            byte[] header = new byte[16];
+            int read = is.read(header);
+            if (read < 4) return null;
+
+            // MZ -> Windows executable (.exe)
+            if (header[0] == 0x4D && header[1] == 0x5A) {
+                return ".exe";
+            }
+            // PK.. -> ZIP / JAR / DOCX / APK
+            if (header[0] == 0x50 && header[1] == 0x4B && header[2] == 0x03 && header[3] == 0x04) {
+                return ".zip";
+            }
+            // 7z.. -> 7-Zip
+            if (header[0] == 0x37 && header[1] == 0x7A && (header[2] & 0xFF) == 0xBC && (header[3] & 0xFF) == 0xAF) {
+                return ".7z";
+            }
+            // Rar! -> RAR
+            if (header[0] == 0x52 && header[1] == 0x61 && header[2] == 0x72 && header[3] == 0x21) {
+                return ".rar";
+            }
+            // %PDF -> PDF
+            if (header[0] == 0x25 && header[1] == 0x50 && header[2] == 0x44 && header[3] == 0x46) {
+                return ".pdf";
+            }
+            // GZip
+            if ((header[0] & 0xFF) == 0x1F && (header[1] & 0xFF) == 0x8B) {
+                return ".gz";
+            }
+            // PNG
+            if ((header[0] & 0xFF) == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47) {
+                return ".png";
+            }
+            // JPEG
+            if ((header[0] & 0xFF) == 0xFF && (header[1] & 0xFF) == 0xD8 && (header[2] & 0xFF) == 0xFF) {
+                return ".jpg";
+            }
+            // GIF
+            if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38) {
+                return ".gif";
+            }
+            // MSI (OLE Compound Document)
+            if ((header[0] & 0xFF) == 0xD0 && (header[1] & 0xFF) == 0xCF && (header[2] & 0xFF) == 0x11 && (header[3] & 0xFF) == 0xE0) {
+                return ".msi";
+            }
+        } catch (Exception ignored) {}
+        return null;
     }
 
     public synchronized void pause() {

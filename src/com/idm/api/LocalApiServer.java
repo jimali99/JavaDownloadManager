@@ -271,17 +271,22 @@ public class LocalApiServer {
             mainFrame.toFront();
 
             if (!finalAutoStart) {
-                AddDownloadDialog dialog = new AddDownloadDialog(mainFrame, downloadUrl, queueManager, settings);
+                AddDownloadDialog dialog = new AddDownloadDialog(mainFrame, downloadUrl, suggestedFileName, queueManager, settings);
                 dialog.setVisible(true);
             } else {
                 new Thread(() -> {
                     String name = suggestedFileName;
                     if (name == null || name.isEmpty()) {
-                        try {
-                            UrlProber.ProbeResult probe = UrlProber.probe(downloadUrl, settings.getUserAgent());
-                            name = probe.getFileName();
-                        } catch (Exception e) {
-                            name = "download_" + System.currentTimeMillis();
+                        String fromUrl = UrlProber.extractFileNameFromUrl(downloadUrl);
+                        if (!fromUrl.startsWith("download_")) {
+                            name = fromUrl;
+                        } else {
+                            try {
+                                UrlProber.ProbeResult probe = UrlProber.probe(downloadUrl, settings.getUserAgent());
+                                name = probe.getFileName();
+                            } catch (Exception e) {
+                                name = fromUrl;
+                            }
                         }
                     }
                     name = FormatUtils.sanitizeFileName(name);
