@@ -108,8 +108,9 @@ The extension is a companion remote control that communicates with JDM on your c
 </details>
 
 <details>
-  *******Notes:- When downloading youtube Videos from browser download directly from extension.(click the JDM extension and you will see the download videos option there).*******
-<summary><b>Can JDM download YouTube videos?</b></summary>
+Notes:- When downloading youtube Videos from browser download directly from extension.(click the JDM extension and you will see the download videos option there)
+
+ <summary><b>Can JDM download YouTube videos?</b></summary>
 JDM sniffs and downloads all direct video and audio streams (MP4, MKV, WebM, FLV, HLS .m3u8). For YouTube, high-resolution streams (1080p, 4K) are split by YouTube into separate encrypted video and audio channels that require stream multiplexing. JDM downloads standard web streams and direct video files directly.
 
 </details>
